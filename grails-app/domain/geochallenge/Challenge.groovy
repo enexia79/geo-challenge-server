@@ -8,10 +8,9 @@ class Challenge {
 	Date	dateCreated
 	Date	lastUpdated
 	Date	expires
-	User	user
 	
 	static hasMany 		= [points: Point]
-	//static belongsTo 	= [user: User]
+	static belongsTo 	= [user: User]
 	
     static constraints = {
 		title blank: false

@@ -7,11 +7,15 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
 @TestFor(Point)
-@Mock(PointContent)
+@Mock([PointContent, Challenge, User])
 class PointSpec extends Specification {
 
     def setup() {
-		def point = new Point(title: "Nowhere", longitude: 100.0, latitude: 25.5)
+		def user = new User(name: "Joe", email:"not@telling.com")
+		user.save(flush: true)
+		def challenge = new Challenge(title: "title", description: "description", user: user)
+		challenge.save(flush:true)
+		def point = new Point(title: "Nowhere", longitude: 100.0, latitude: 25.5, challenge: challenge)
 		point.save(flush:true)
 		def content = new PointContent(type: ContentType.TEXT, data: "Testing Data".bytes, point: point)
 		content.save(flush:true)
@@ -22,6 +26,7 @@ class PointSpec extends Specification {
 
     void "test add/delete/update"() {
 		expect:
+			Challenge.count() == 1
 			Point.count() == 1
 			new String(PointContent.get(1).data, "UTF-8") == "Testing Data"
 			PointContent.get(1).type == ContentType.TEXT
@@ -50,7 +55,7 @@ class PointSpec extends Specification {
 			Point.count() == 0
 			
 		when:
-			point = new Point(title: "new", longitude: 50.2, latitude: 15.0)
+			point = new Point(title: "new", longitude: 50.2, latitude: 15.0, challenge: Challenge.get(1))
 			point.save(flush:true)
 		then:
 			Point.count() == 1

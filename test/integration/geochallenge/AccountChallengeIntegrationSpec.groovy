@@ -1,14 +1,8 @@
 package geochallenge
 
-import grails.test.mixin.TestFor
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
 
-/**
- * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
- */
-@TestFor(Challenge)
-@Mock([User, Point, Achievement, PointContent, AchievementContent])
-class ChallengeSpec extends Specification {
+class AccountChallengeIntegrationSpec extends IntegrationSpec {
 
     def setup() {
 		def user = new User(name: "Billy", email: "blah@nobody.net")

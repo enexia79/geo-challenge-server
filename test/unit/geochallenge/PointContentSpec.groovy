@@ -7,12 +7,16 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
 @TestFor(PointContent)
-@Mock(Point)
+@Mock([Point, Challenge, User])
 class PointContentSpec extends Specification {
 
     def setup() 
 	{
-		def point = new Point(title: "Nowhere", longitude: 100.0, latitude: 25.5)
+		def user = new User(name: "Joe", email:"not@telling.com")
+		user.save(flush: true)
+		def challenge = new Challenge(title: "title", description: "description", user: user)
+		challenge.save(flush:true)
+		def point = new Point(title: "Nowhere", longitude: 100.0, latitude: 25.5, challenge: challenge)
 		point.save(flush:true)
 		def content = new PointContent(type: ContentType.TEXT, data: "Testing Data".bytes, point: point)
 		content.save(flush:true)
