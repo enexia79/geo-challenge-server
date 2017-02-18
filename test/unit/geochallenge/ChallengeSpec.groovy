@@ -47,5 +47,10 @@ class ChallengeSpec extends Specification {
 			Challenge.get(1).title == "new title"
 			Challenge.get(1).description == "new description"
 			Challenge.get(1).points?.size() == 1
+			
+		when:
+			Challenge.get(1).delete(flush:true)
+		then:
+			Challenge.count() == 0
     }
 }

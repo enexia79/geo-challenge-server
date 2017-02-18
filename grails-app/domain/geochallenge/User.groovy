@@ -15,5 +15,7 @@ class User {
 		name blank: false
 		email blank: false, unique: true, email: true
 		active nullable: false
+		achievements nullable: true
+		challenges nullable: true
     }
 }

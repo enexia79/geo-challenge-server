@@ -1,9 +1,12 @@
 dataSource {
     pooled = true
     jmxExport = true
-    driverClassName = "org.h2.Driver"
-    username = "sa"
-    password = ""
+    //driverClassName = "com.mysql.jdbc.Driver"
+    //username = "geochallenge"
+    //password = "3f!45xyv"
+	driverClassName = "org.h2.Driver"
+	username = "sa"
+	password = ""
 }
 hibernate {
     cache.use_second_level_cache = true
@@ -18,14 +21,17 @@ hibernate {
 environments {
     development {
         dataSource {
-            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+            //dbCreate = "update"
+			//url = "jdbc:mysql://localhost:3306/geochallenge?useUnicode=yes&characterEncoding=UTF-8"
+			dbCreate = "create-drop"
+			url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
     test {
         dataSource {
             dbCreate = "create-drop"
-            url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+			//url = "jdbc:mysql://localhost:3306/geochallengetest?useUnicode=yes&characterEncoding=UTF-8"
+			url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
     production {
