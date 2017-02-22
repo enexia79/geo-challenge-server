@@ -11,7 +11,7 @@ import spock.lang.Specification
 class ChallengeSpec extends Specification {
 
     def setup() {
-		def user = new User(name: "Billy", email: "blah@nobody.net")
+		def user = new User(name: "Billy", surrogateId: "blah@nobody.net")
 		user.save(flush:true)
 		def challenge = new Challenge(title: "title", description: "description", user: user)
 		challenge.save(flush:true)

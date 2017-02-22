@@ -11,7 +11,7 @@ class UserSpec extends Specification {
 
     def setup() 
 	{
-		def user = new User(name: 'david', email: 'enexia@gmail.com')
+		def user = new User(name: 'david', surrogateId: 'enexia@gmail.com')
 		
 		user.save(flush:true)
     }
@@ -22,7 +22,7 @@ class UserSpec extends Specification {
 	
     void "test firstLoad"() 
 	{
-    	def user = new User(name: 'test', email: 'another@gmail.com')
+    	def user = new User(name: 'test', surrogateId: 'another@gmail.com')
 		when:
 			user.save(flush:true)
 		then:
@@ -32,22 +32,22 @@ class UserSpec extends Specification {
 			def foundUser = user.get(user.id)
 		then:
 			foundUser.name.equals('test')
-			foundUser.email.equals('another@gmail.com')
+			foundUser.surrogateId.equals('another@gmail.com')
     }
 	
 	void "test delete"()
 	{
-		def user = User.findByEmail('enexia@gmail.com')
+		def user = User.findBySurrogateId('enexia@gmail.com')
 		when:
 			user.delete()
 		then:
-			User.findByEmail('enexia@gmail.com') == null;
+			User.findBySurrogateId('enexia@gmail.com') == null;
 	}
 	
-	void "test unique email"()
+	void "test unique surrogateID"()
 	{
 		when:
-			(new User(name: 'david', email: 'enexia@gmail.com')).save(failOnError:false)
+			(new User(name: 'david', surrogateId: 'enexia@gmail.com')).save(failOnError:false)
 		then:
 			User.count() == 1
 	}
@@ -55,9 +55,9 @@ class UserSpec extends Specification {
 	void "test default values"()
 	{
 		when:
-			def user 	= new User(name: 'alejandra', email: 'bogas@nowhere.com').save(flush:true)
+			def user 	= new User(name: 'alejandra', surrogateId: 'bogas@nowhere.com').save(flush:true)
 			def user2 	= User.get(user.id)
-			def user3 	= new User(name: 'dac', email: 'youwish@here.com', active: Boolean.FALSE).save(flush:true)
+			def user3 	= new User(name: 'dac', surrogateId: 'youwish@here.com', active: Boolean.FALSE).save(flush:true)
 			def user4	= User.findByName('dac')
 		then:
 			user.id != null

@@ -11,7 +11,7 @@ import spock.lang.Specification
 class PointSpec extends Specification {
 
     def setup() {
-		def user = new User(name: "Joe", email:"not@telling.com")
+		def user = new User(name: "Joe", surrogateId:"not@telling.com")
 		user.save(flush: true)
 		def challenge = new Challenge(title: "title", description: "description", user: user)
 		challenge.save(flush:true)

@@ -12,7 +12,7 @@ class AchievementContentSpec extends Specification {
 
     def setup() 
 	{
-		def user = new User(name: "Joe", email:"not@telling.com")
+		def user = new User(name: "Joe", surrogateId:"not@telling.com")
 		user.save(flush: true)
 		def challenge = new Challenge(title: "blah", description: "blah blah", user: User.get(1))
 		challenge.save(flush: true)

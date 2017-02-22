@@ -7,9 +7,13 @@
 //                             "file:${userHome}/.grails/${appName}-config.properties",
 //                             "file:${userHome}/.grails/${appName}-config.groovy"]
 
-// if (System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
+if (System.properties["${appName}.config.location"]) {
+    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
+}
+
+//Default App Token for Authentication to API
+//	this token should be overridden by an external config on the Production server
+app.token = "geo-ninjas"
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 

@@ -5,7 +5,7 @@ import grails.test.spock.IntegrationSpec
 class DomainsIntegrationSpec extends IntegrationSpec {
 
     def setup() {
-		def user = new User(name: "Billy", email: "blah@nobody.net")
+		def user = new User(name: "Billy", surrogateId: "blah@nobody.net")
 		user.save()
 		def challenge = new Challenge(title: "title", description: "description", user: user)
 		challenge.save()
