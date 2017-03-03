@@ -14,9 +14,9 @@ class UserController {
 	/**
 	 * Create user account
 	 * @param token Application authentication token
-	 * @param name	Display Name for User
+	 * @param name Display Name for User
 	 * @param surrogateId	Unique Social Id for this user i.e. facebook or google id
-	 * @return JSON response with success = true or false.  if true then id = <new user id> else error field will contain error string
+	 * @return JSON response with success = true or false.  if true then id = <new user id> else error field will contain error string.  Error codes: auth_failure, duplicate_surrogateId, missing_name & missing_surrogateId
 	 */
 	def create() {
 		def user
@@ -48,7 +48,7 @@ class UserController {
 	 * Get the user Id given a surrogateId
 	 * @param token Application authentication token
 	 * @param surrogateId	Unique Social Id for this user i.e. facebook or google id
-	 * @return JSON response with success = true or false.  if true then id = <new user id> else error field will contain error string
+	 * @return JSON response with success = true or false.  if true then id = <new user id> else error field will contain error string. Error codes: auth_failure & surrogateId_doesnt_exist
 	 */
 	def getId() {
 		def id
