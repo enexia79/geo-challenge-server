@@ -53,4 +53,33 @@ class ChallengeSpec extends Specification {
 		then:
 			Challenge.count() == 0
     }
+	
+	void "test expires"() {
+		expect:
+			User.count() == 1
+			Challenge.count() == 1
+			Point.count() == 2
+			Challenge.get(1).title == "title"
+			Challenge.get(1).description == "description"
+			Challenge.get(1).user == User.get(1)
+			Challenge.get(1).points?.size() == 2
+			Challenge.get(1).isExpired() == false
+			
+		when:
+			def challenge 		= Challenge.get(1)
+			def expires			= new Date(new Date().getTime() - 1000)
+			challenge.expires	= expires
+			challenge.save()
+		then:
+			Challenge.get(1).expires.equals(expires)
+			Challenge.get(1).isExpired() == true
+			
+		when:
+			expires				= new Date(new Date().getTime() + 10000)
+			challenge.expires	= expires
+			challenge.save()
+		then:
+			Challenge.get(1).expires.equals(expires)
+			Challenge.get(1).isExpired() == false
+	}
 }

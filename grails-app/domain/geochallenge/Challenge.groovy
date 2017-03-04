@@ -18,4 +18,12 @@ class Challenge {
 		expires nullable: true
 		user nullable: false
     }
+	
+	public boolean isExpired() {
+		if(expires) {
+			return expires.compareTo(new Date()) < 0
+		}
+		else
+			return false
+	}
 }
