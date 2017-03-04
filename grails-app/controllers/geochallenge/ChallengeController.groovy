@@ -25,12 +25,12 @@ class ChallengeController {
 	 * Create challenge
 	 * @param token Application authentication token
 	 * @param user User Id
-	 * @param challenge JSON representing challenge info example : {challenge: {title: "title", description: "description", expires: 1234567890, 
-	 * 			points: [{title: "pointA Title", longitude: 25.2, latitude: 12.5, type: text, data: "Eat my Shorts"}, 
-	 * 				{title: "PointB Title", longitude: 12.0, latitude: 11.0, type: picture},
-	 * 				{title: "PointC Title", longitude: 8.0, latitude: 11.65, type: video}]}}
+	 * @param challenge JSON representing challenge info example : {title: "title", description: "description", expires: 1234567890, 
+	 * 			points: [{title: "pointA Title", longitude: 25.2, latitude: 12.5, type: "text", data: "Eat my Shorts"}, 
+	 * 				{title: "PointB Title", longitude: 12.0, latitude: 11.0, type: "picture"},
+	 * 				{title: "PointC Title", longitude: 8.0, latitude: 11.65, type: "video"}]}
 	 * @return JSON response with success = true or false.  if true then id = <new challenge id> and pointIds = array of point id's else error field will contain error string.  
-	 * 			Error codes: auth_failure, missing_user, missing_challenge, user_doesnt_exist, invalid_json, missing_title, expires_not_number, missing_points, point_gps_invalid, missing_point_text, invalid_point_content_type
+	 * 			Error codes: auth_failure, missing_user, missing_challenge, user_doesnt_exist, invalid_json, missing_title, expires_not_number, missing_points, point_gps_invalid, missing_point_text, invalid_point_content_type, point_data_unexpected
 	 */
     def create() {
 		def challenge
