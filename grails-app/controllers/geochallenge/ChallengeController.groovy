@@ -4,6 +4,7 @@ import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONException
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.springframework.web.multipart.MultipartHttpServletRequest
 
 class ChallengeController {
 	public static final String ERROR_MISSING_USER					= "missing_user"
@@ -13,12 +14,14 @@ class ChallengeController {
 	public static final String ERROR_MISSING_TITLE					= "missing_title"
 	public static final String ERROR_EXPIRES_INVALID				= "expires_not_number"
 	public static final String ERROR_MISSING_POINTS					= "missing_points"
+	public static final String ERROR_MISSING_POINT					= "missing_point"
 	public static final String ERROR_POINT_GPS_INVALID				= "point_gps_invalid"
 	public static final String ERROR_MISSING_POINT_TEXT				= "missing_point_text"
 	public static final String ERROR_INVALID_POINT_CONTENT_TYPE		= "invalid_point_content_type"
 	public static final String ERROR_POINT_DATA_UNEXPECTED			= "point_data_unexpected"
 	public static final String ERROR_CHALLENGE_DOESNT_EXIST			= "challenge_doesnt_exist"
 	public static final String ERROR_CHALLENGE_HAS_ACHIEVEMENT		= "challenge_has_achievement"
+	public static final String ERROR_POINT_DOESNT_EXIST				= "point_doesnt_exist"
 	
 	def challengeService
 	def authService
@@ -64,7 +67,7 @@ class ChallengeController {
 											results = [success: false, error: ERROR_POINT_GPS_INVALID]
 										else if(point.type && type == null)
 											results = [success: false, error: ERROR_INVALID_POINT_CONTENT_TYPE]
-										else if(type && type.equals(ContentType.TEXT) && point.data == null || point.data.trim().isEmpty())
+										else if(type && type.equals(ContentType.TEXT) && (point.data == null || point.data.trim().isEmpty()))
 											results = [success: false, error: ERROR_MISSING_POINT_TEXT]
 										else if(type && !type.equals(ContentType.TEXT) && point.data && !point.data.isEmpty())
 											results = [success: false, error: ERROR_POINT_DATA_UNEXPECTED]
@@ -132,7 +135,7 @@ class ChallengeController {
 	}
 
 	/**
-	 * Create challenge
+	 * Delete challenge
 	 * @param token Application authentication token
 	 * @param challenge Challenge Id
 	 * @return JSON response with success = true or false.  if false, error field will contain error string.
@@ -162,4 +165,38 @@ class ChallengeController {
 		
 		render results as JSON
 	}	
+	
+	/**
+	 * Set point Content (used for video/picture content)
+	 * @param token as request header Application authentication token
+	 * @param point as request header Point Id
+	 * @return JSON response with success = true or false.  if false, error field will contain error string.
+	 * 			Error codes: auth_failure, missing_point, point_doesnt_exist
+	 */
+	def setPointContent() {
+		def results
+		def token = request.getHeader("token")
+		def pointId = request.getHeader("point")
+		
+		if(!authService.isAuthorized(token)) {
+			results = [success: false, error: AuthService.ERROR_AUTH_FAILURE]
+		}
+		else if(pointId) {
+			def point = Point.get(pointId)
+			if(point) {
+				if(point.content)
+					point.content.delete()
+				//byte [] data = request.
+				println request.contentType  //TODO finish me
+				println request.contentLength
+				results = [success: true]
+			}
+			else
+				results = [success: false, error: ERROR_POINT_DOESNT_EXIST]
+		}
+		else
+			results = [success: false, error: ERROR_MISSING_POINT]
+		
+		render results as JSON
+	}
 }
