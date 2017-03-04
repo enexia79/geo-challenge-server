@@ -8,7 +8,7 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(ChallengeController)
-@Mock([User, Challenge, ChallengeService, AuthService])
+@Mock([User, Challenge, ChallengeService, AuthService, Achievement])
 class ChallengeControllerSpec extends Specification {
 
 	private final String TOKEN = "geo-ninjas"
@@ -196,6 +196,110 @@ class ChallengeControllerSpec extends Specification {
 			controller.create()
 		then:
 			Challenge.count() == 0
+			response.json.success == false
+			response.json.error == controller.ERROR_MISSING_CHALLENGE
+	}
+	
+	void "test delete"() {
+		expect:
+			User.count() == 1
+			Challenge.count() == 0
+			
+		when:
+			controller.challengeService.create([title: "deleteMe", user: User.get(1)], [[longitude: 4.0, latitude: 3.0]])
+		then:
+			Challenge.count() == 1
+			
+		when:
+			params.challenge = Challenge.findByTitle("deleteMe").id
+			params.token = TOKEN
+			controller.delete()
+		then:
+			Challenge.count() == 0
+			response.json.success == true
+	}
+	
+	void "test delete unauthorized"() {
+		expect:
+			User.count() == 1
+			Challenge.count() == 0
+			
+		when:
+			controller.challengeService.create([title: "deleteMe", user: User.get(1)], [[longitude: 4.0, latitude: 3.0]])
+		then:
+			Challenge.count() == 1
+			
+		when:
+			params.challenge = Challenge.findByTitle("deleteMe").id
+			params.token = "other"
+			controller.delete()
+		then:
+			Challenge.count() == 1
+			response.json.success == false
+			response.json.error == AuthService.ERROR_AUTH_FAILURE
+	}
+	
+	void "test delete has achievement"() {
+		expect:
+			User.count() == 1
+			Challenge.count() == 0
+			Achievement.count() == 0
+			
+		when:
+			controller.challengeService.create([title: "deleteMe", user: User.get(1)], [[longitude: 4.0, latitude: 3.0]])
+			def achievement = new Achievement(user: User.get(1), challenge: Challenge.get(1))
+			achievement.save()
+		then:
+			Challenge.count() == 1
+			Achievement.count() == 1
+			
+		when:
+			params.challenge = Challenge.findByTitle("deleteMe").id
+			params.token = TOKEN
+			controller.delete()
+		then:
+			Challenge.count() == 1
+			response.json.success == false
+			response.json.error == controller.ERROR_CHALLENGE_HAS_ACHIEVEMENT
+	}
+	
+	void "test delete challenge doesnt exist"() {
+		expect:
+			User.count() == 1
+			Challenge.count() == 0
+			Achievement.count() == 0
+			
+		when:
+			controller.challengeService.create([title: "deleteMe", user: User.get(1)], [[longitude: 4.0, latitude: 3.0]])
+		then:
+			Challenge.count() == 1
+			
+		when:
+			params.challenge = 1000
+			params.token = TOKEN
+			controller.delete()
+		then:
+			Challenge.count() == 1
+			response.json.success == false
+			response.json.error == controller.ERROR_CHALLENGE_DOESNT_EXIST
+	}
+	
+	void "test delete missing challenge"() {
+		expect:
+			User.count() == 1
+			Challenge.count() == 0
+			Achievement.count() == 0
+			
+		when:
+			controller.challengeService.create([title: "deleteMe", user: User.get(1)], [[longitude: 4.0, latitude: 3.0]])
+		then:
+			Challenge.count() == 1
+			
+		when:
+			params.token = TOKEN
+			controller.delete()
+		then:
+			Challenge.count() == 1
 			response.json.success == false
 			response.json.error == controller.ERROR_MISSING_CHALLENGE
 	}

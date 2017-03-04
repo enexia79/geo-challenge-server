@@ -17,6 +17,8 @@ class ChallengeController {
 	public static final String ERROR_MISSING_POINT_TEXT				= "missing_point_text"
 	public static final String ERROR_INVALID_POINT_CONTENT_TYPE		= "invalid_point_content_type"
 	public static final String ERROR_POINT_DATA_UNEXPECTED			= "point_data_unexpected"
+	public static final String ERROR_CHALLENGE_DOESNT_EXIST			= "challenge_doesnt_exist"
+	public static final String ERROR_CHALLENGE_HAS_ACHIEVEMENT		= "challenge_has_achievement"
 	
 	def challengeService
 	def authService
@@ -101,4 +103,36 @@ class ChallengeController {
 		
 		render results as JSON
 	}
+
+	/**
+	 * Create challenge
+	 * @param token Application authentication token
+	 * @param challenge Challenge Id
+	 * @return JSON response with success = true or false.  if false, error field will contain error string.
+	 * 			Error codes: auth_failure, missing_challenge, challenge_doesnt_exist, challenge_has_achievement
+	 */
+	def delete() {
+		def results
+		
+		if(!authService.isAuthorized(params.token)) {
+			results = [success: false, error: AuthService.ERROR_AUTH_FAILURE]
+		}
+		else if(params.challenge){
+			def challenge = Challenge.get(params.challenge)
+			if(challenge) {
+				if(Achievement.findByChallenge(challenge))
+					results = [success: false, error: ERROR_CHALLENGE_HAS_ACHIEVEMENT]
+				else {
+					challenge.delete()
+					results = [success: true]
+				}
+			}
+			else
+				results = [success: false, error: ERROR_CHALLENGE_DOESNT_EXIST]
+		}
+		else
+			results = [success: false, error: ERROR_MISSING_CHALLENGE]
+		
+		render results as JSON
+	}	
 }
