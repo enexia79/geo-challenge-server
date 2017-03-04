@@ -103,6 +103,33 @@ class ChallengeController {
 		
 		render results as JSON
 	}
+	
+	/**
+	 * get challenge info
+	 * @param token Application authentication token
+	 * @param challenge Challenge Id
+	 * @return JSON response with success = true or false.  if true, challenge = challenge JSON info.  if false, error field will contain error string.
+	 * 			Error codes: auth_failure, missing_challenge, challenge_doesnt_exist
+	 */
+	def get() {
+		def challenge
+		def results
+		
+		if(!authService.isAuthorized(params.token)) {
+			results = [success: false, error: AuthService.ERROR_AUTH_FAILURE]
+		}
+		else if(params.challenge) {
+			challenge = Challenge.get(params.challenge) 
+			if(challenge)
+				results = [success: true, challenge: challengeService.toJSON(challenge)]
+			else
+				results = [success: false, error: ERROR_CHALLENGE_DOESNT_EXIST]
+		}
+		else
+			results = [success: false, error: ERROR_MISSING_CHALLENGE]
+		
+		render results as JSON
+	}
 
 	/**
 	 * Create challenge

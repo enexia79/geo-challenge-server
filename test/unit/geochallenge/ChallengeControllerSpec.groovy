@@ -32,6 +32,10 @@ class ChallengeControllerSpec extends Specification {
 			
 			return challenge
 		}
+		service.demand.toJSON {
+			def challenge ->
+			return [title: "mocked"]
+		}
 		controller.challengeService = service.createMock()
     }
 
@@ -197,6 +201,72 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 0
 			response.json.success == false
+			response.json.error == controller.ERROR_MISSING_CHALLENGE
+	}
+	
+	void "test get"() {
+		expect:
+			User.count() == 1
+			Challenge.count() == 0
+			
+		when:
+			controller.challengeService.create([title: "test", user: User.get(1)], [[longitude: 4.0, latitude: 3.0]])
+		then:
+			Challenge.count() == 1
+			
+		when:
+			params.challenge = Challenge.findByTitle("test").id
+			params.token = TOKEN
+			controller.get()
+		then:
+			response.json.success == true
+			response.json.challenge != null
+	}
+	
+	void "test get unauthorized"() {
+		when:
+			controller.challengeService.create([title: "test", user: User.get(1)], [[longitude: 4.0, latitude: 3.0]])
+		then:
+			Challenge.count() == 1
+			
+		when:
+			params.challenge = Challenge.findByTitle("test").id
+			params.token = "other"
+			controller.get()
+		then:
+			response.json.success == false
+			response.json.challenge == null
+			response.json.error == AuthService.ERROR_AUTH_FAILURE
+	}
+	
+	void "test get challenge doesnt exist"() {
+		when:
+			controller.challengeService.create([title: "test", user: User.get(1)], [[longitude: 4.0, latitude: 3.0]])
+		then:
+			Challenge.count() == 1
+			
+		when:
+			params.challenge = 1000
+			params.token = TOKEN
+			controller.get()
+		then:
+			response.json.success == false
+			response.json.challenge == null
+			response.json.error == controller.ERROR_CHALLENGE_DOESNT_EXIST
+	}
+	
+	void "test get missing challenge"() {
+		when:
+			controller.challengeService.create([title: "test", user: User.get(1)], [[longitude: 4.0, latitude: 3.0]])
+		then:
+			Challenge.count() == 1
+			
+		when:
+			params.token = TOKEN
+			controller.get()
+		then:
+			response.json.success == false
+			response.json.challenge == null
 			response.json.error == controller.ERROR_MISSING_CHALLENGE
 	}
 	
