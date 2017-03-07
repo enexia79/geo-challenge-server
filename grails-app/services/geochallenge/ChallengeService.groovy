@@ -43,12 +43,13 @@ class ChallengeService {
 	 * @return list of challenges
 	 */
 	def search(searchCriteria) {
-		def user 		= searchCriteria.user
-		def longitude	= searchCriteria.longitude
-		def latitude	= searchCriteria.latitude
-		def radius		= searchCriteria.radius
-		def max			= searchCriteria.max
-		def sort		= searchCriteria.sort ? searchCriteria.sort : SORT_POPULAR
+		def user 			= searchCriteria.user
+		def longitude		= searchCriteria.longitude
+		def latitude		= searchCriteria.latitude
+		def radius			= searchCriteria.radius
+		def max				= searchCriteria.max
+		def includeExpired	= searchCriteria.includeExpired ? searchCriteria.includeExpired : false
+		def sort			= searchCriteria.sort ? searchCriteria.sort : SORT_POPULAR
 		
 		if(max == null) 
 			throw new RuntimeException("Missing required parameter max (max_results)")
@@ -60,13 +61,13 @@ class ChallengeService {
 		def results = []
 		if(longitude && latitude && radius)
 			all.each { challenge ->
-				if(!challenge.isExpired())
+				if(includeExpired || !challenge.isExpired())
 					if(challenge.getDistance(latitude, longitude) <= radius)
 						results.push(challenge)
 			}
 		else
 			all.each { challenge ->
-				if(!challenge.isExpired())
+				if(includeExpired || !challenge.isExpired())
 					results.push(challenge)
 			}
 			

@@ -194,6 +194,29 @@ class ChallengeServiceSpec extends Specification {
 			challenges.size() == 2
 	}
 	
+	void "test search include expired"() {
+		expect:
+			User.count() == 2
+			Challenge.count() == 1
+			Point.count() == 2
+			Achievement.count() == 0
+			
+		when:
+			def challenge = new Challenge(title: "title2", description: "description", user: User.get(1), latitude: 39.973277, longitude: -112.124345, expires: new Date(new Date().getTime() - (5 * 60 * 1000)))
+			challenge.save(flush:true)
+			User.get(1).addToChallenges(challenge).save(flush: true)
+			def point = new Point(latitude: challenge.latitude, longitude: challenge.longitude, challenge: Challenge.get(1), content: "Testing Data")
+			point.save(flush:true)
+			Challenge.get(1).addToPoints(point).save(flush:true)
+			def achievement = new Achievement(user: User.get(2), challenge: challenge)
+			achievement.save(flush:true)
+			def challenges = service.search(includeExpired: true, max: 100)
+		then:
+			Challenge.count() == 2
+			Achievement.count() == 1
+			challenges.size() == 2
+	}
+	
 	void "test toJSON"() {
 		expect:
 			User.count() == 2
