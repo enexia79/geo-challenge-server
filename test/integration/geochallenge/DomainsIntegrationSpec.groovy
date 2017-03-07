@@ -7,10 +7,10 @@ class DomainsIntegrationSpec extends IntegrationSpec {
     def setup() {
 		def user = new User(name: "Billy", surrogateId: "blah@nobody.net")
 		user.save()
-		def challenge = new Challenge(title: "title", description: "description", user: user)
+		def challenge = new Challenge(title: "title", description: "description", user: user, latitude: 3.5, longitude: 20.0)
 		challenge.save()
 		user.addToChallenges(challenge).save()
-		def point = new Point(longitude: 20.0, latitude: 3.5, challenge: challenge)
+		def point = new Point(latitude: challenge.latitude, longitude: challenge.longitude, challenge: challenge)
 		point.save()
 		challenge.addToPoints(point).save()
 		point = new Point(longitude: 21.1, latitude: 2.2, challenge: challenge, content: "Testing Data")

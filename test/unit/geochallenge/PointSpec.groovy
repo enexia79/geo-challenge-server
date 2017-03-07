@@ -14,9 +14,9 @@ class PointSpec extends Specification {
     def setup() {
 		def user = new User(name: "Joe", surrogateId:"not@telling.com")
 		user.save(flush: true)
-		def challenge = new Challenge(title: "title", description: "description", user: user)
+		def challenge = new Challenge(title: "title", description: "description", user: user, latitude: 25.5, longitude: 100.0)
 		challenge.save(flush:true)
-		def point = new Point(title: "Nowhere", longitude: 100.0, latitude: 25.5, challenge: challenge, content: "Testing Data")
+		def point = new Point(title: "Nowhere", latitude: challenge.latitude, longitude: challenge.longitude, challenge: challenge, content: "Testing Data")
 		point.save(flush:true)
     }
 

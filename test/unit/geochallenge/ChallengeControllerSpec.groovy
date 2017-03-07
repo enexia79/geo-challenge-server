@@ -27,6 +27,8 @@ class ChallengeControllerSpec extends Specification {
 		service = mockFor(ChallengeService)
 		service.demand.create {
 			def info, pointsInfo ->
+			info.latitude = pointsInfo[0].latitude
+			info.longitude = pointsInfo[0].longitude
 			def challenge = new Challenge(info)
 			challenge.save()
 			

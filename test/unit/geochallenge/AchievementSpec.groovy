@@ -1,5 +1,6 @@
 package geochallenge
 
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
@@ -14,7 +15,7 @@ class AchievementSpec extends Specification {
 	{
 		def user = new User(name: "Joe", surrogateId:"not@telling.com")
 		user.save(flush: true)
-		def challenge = new Challenge(title: "blah", description: "blah blah", user: User.get(1))
+		def challenge = new Challenge(title: "blah", description: "blah blah", user: User.get(1), longitude: 10, latitude: 5)
 		challenge.save(flush: true)
 		user.addToChallenges(challenge).save(flush: true)
 		def achievement = new Achievement(challenge: challenge, user: user, content: "Testing Data")
