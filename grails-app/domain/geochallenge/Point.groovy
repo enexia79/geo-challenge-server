@@ -2,10 +2,10 @@ package geochallenge
 
 class Point {
 	String	title
+	String	content
 	double	longitude
 	double	latitude
 	
-	static hasOne 		= [content: PointContent]
 	static belongsTo	= [challenge: Challenge]
 	
     static constraints = {

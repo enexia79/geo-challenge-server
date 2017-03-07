@@ -5,11 +5,11 @@ import java.util.Date;
 class Achievement {
 
 	Challenge 			challenge
+	String				content
 	Date 				dateCreated
 	Date 				lastUpdated
 	
 	static belongsTo 	= [user: User]
-	static hasOne		= [content: AchievementContent]
 	
     static constraints = {
 		challenge nullable: false

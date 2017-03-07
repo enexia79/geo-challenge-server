@@ -50,7 +50,7 @@ class ChallengeControllerSpec extends Specification {
 		when:
 			params.user = 1
 			params.token = TOKEN
-			params.challenge = '{title: "title", expires: 123456789, points: [{longitude: 3.0, latitude: 2.5, type: "text", data: "Testing"}]}'
+			params.challenge = '{title: "title", expires: 1488907050430, points: [{longitude: 3.0, latitude: 2.5, content: "Testing"}]}'
 			controller.create()
 		then:
 			Challenge.count() == 1
@@ -66,7 +66,7 @@ class ChallengeControllerSpec extends Specification {
 		when:
 			params.user = 1
 			params.token = "other"
-			params.challenge = '{title: "title", points: [{longitude: 3.0, latitude: 2.5, type: "text", data: "Testing"}]}'
+			params.challenge = '{title: "title", points: [{longitude: 3.0, latitude: 2.5, content: "Testing"}]}'
 			controller.create()
 		then:
 			Challenge.count() == 0
@@ -78,7 +78,7 @@ class ChallengeControllerSpec extends Specification {
 		when:
 			params.user = 1
 			params.token = TOKEN
-			params.challenge = '{title: "", points: [{longitude: 3.0, latitude: 2.5, type: "text", data: "Testing"}]}'
+			params.challenge = '{title: "", points: [{longitude: 3.0, latitude: 2.5, content: "Testing"}]}'
 			controller.create()
 		then:
 			Challenge.count() == 0
@@ -90,7 +90,7 @@ class ChallengeControllerSpec extends Specification {
 		when:
 			params.user = 1
 			params.token = TOKEN
-			params.challenge = '{title: "title", points: [{longitude: 3.0, latitude: 2.5, type: "text", data: "Testing"}], expires: "hi"}'
+			params.challenge = '{title: "title", points: [{longitude: 3, latitude: 2.5, content: "Testing"}], expires: "hi"}'
 			controller.create()
 		then:
 			Challenge.count() == 0
@@ -114,7 +114,7 @@ class ChallengeControllerSpec extends Specification {
 		when:
 			params.user = 1
 			params.token = TOKEN
-			params.challenge = '{title: "title", expires: 123456789, points: [{longitude: "not", latitude: 2.5, type: "text", data: "Testing"}]}'
+			params.challenge = '{title: "title", expires: 1488907050430, points: [{longitude: "not", latitude: 2.5, content: "Testing"}]}'
 			controller.create()
 		then:
 			Challenge.count() == 0
@@ -122,47 +122,11 @@ class ChallengeControllerSpec extends Specification {
 			response.json.error == controller.ERROR_POINT_GPS_INVALID
 	}
 	
-	void "test create invalid type"() {
-		when:
-			params.user = 1
-			params.token = TOKEN
-			params.challenge = '{title: "title", expires: 123456789, points: [{longitude: 3.0, latitude: 2.5, type: "other", data: "Testing"}]}'
-			controller.create()
-		then:
-			Challenge.count() == 0
-			response.json.success == false
-			response.json.error == controller.ERROR_INVALID_POINT_CONTENT_TYPE
-	}
-	
-	void "test create point missing text"() {
-		when:
-			params.user = 1
-			params.token = TOKEN
-			params.challenge = '{title: "title", expires: 123456789, points: [{longitude: 3.0, latitude: 2.5, type: "text", data: ""}]}'
-			controller.create()
-		then:
-			Challenge.count() == 0
-			response.json.success == false
-			response.json.error == controller.ERROR_MISSING_POINT_TEXT
-	}
-	
-	void "test create unexpected point data"() {
-		when:
-			params.user = 1
-			params.token = TOKEN
-			params.challenge = '{title: "title", expires: 123456789, points: [{longitude: 3.0, latitude: 2.5, type: "video", data: "Testing"}]}'
-			controller.create()
-		then:
-			Challenge.count() == 0
-			response.json.success == false
-			response.json.error == controller.ERROR_POINT_DATA_UNEXPECTED
-	}
-	
 	void "test create invalid json"() {
 		when:
 			params.user = 1
 			params.token = TOKEN
-			params.challenge = '{title: "title",invalidEntry: ,expires: 123456789, points: [{longitude: 3.0, latitude: 2.5, type: "text", data: "Testing"}]}'
+			params.challenge = '{title: "title",invalidEntry: ,expires: 1488907050430, points: [{longitude: 3.0, latitude: 2.5, type: "text", data: "Testing"}]}'
 			controller.create()
 		then:
 			Challenge.count() == 0
@@ -174,7 +138,7 @@ class ChallengeControllerSpec extends Specification {
 		when:
 			params.user = 2
 			params.token = TOKEN
-			params.challenge = '{title: "title", expires: 123456789, points: [{longitude: 3.0, latitude: 2.5, type: "text", data: "Testing"}]}'
+			params.challenge = '{title: "title", expires: 1488907050430, points: [{longitude: 3.0, latitude: 2.5, content: "Testing"}]}'
 			controller.create()
 		then:
 			Challenge.count() == 0
@@ -185,7 +149,7 @@ class ChallengeControllerSpec extends Specification {
 	void "test create missing user"() {
 		when:
 			params.token = TOKEN
-			params.challenge = '{title: "title", expires: 123456789, points: [{longitude: 3.0, latitude: 2.5, type: "text", data: "Testing"}]}'
+			params.challenge = '{title: "title", expires: 1488907050430, points: [{longitude: 3.0, latitude: 2.5, content: "Testing"}]}'
 			controller.create()
 		then:
 			Challenge.count() == 0

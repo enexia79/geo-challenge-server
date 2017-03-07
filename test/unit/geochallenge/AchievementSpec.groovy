@@ -7,7 +7,7 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
 @TestFor(Achievement)
-@Mock([User, Challenge, AchievementContent])
+@Mock([User, Challenge])
 class AchievementSpec extends Specification {
 
     def setup() 
@@ -17,10 +17,8 @@ class AchievementSpec extends Specification {
 		def challenge = new Challenge(title: "blah", description: "blah blah", user: User.get(1))
 		challenge.save(flush: true)
 		user.addToChallenges(challenge).save(flush: true)
-		def achievement = new Achievement(challenge: challenge, user: user)
+		def achievement = new Achievement(challenge: challenge, user: user, content: "Testing Data")
 		achievement.save(flush: true)
-		def content = new AchievementContent(type: ContentType.TEXT, data: "Testing Data".bytes, achievement: achievement)
-		content.save(flush: true)
 		user.addToAchievements(achievement).save(flush:true)
     }
 
@@ -34,9 +32,7 @@ class AchievementSpec extends Specification {
 			User.count() == 1
 			Challenge.count() == 1
 			Achievement.count() == 1
-			AchievementContent.count() == 1
-			AchievementContent.get(1).achievement == Achievement.get(1)
-			Achievement.get(1).content == AchievementContent.get(1)
+			Achievement.get(1).content == "Testing Data"
 			User.get(1).achievements?.iterator().next() == Achievement.get(1)
 			
 		when:
@@ -53,7 +49,6 @@ class AchievementSpec extends Specification {
 			achievement.delete(flush: true)
 		then:
 			Achievement.count() == 1
-			AchievementContent.count() == 0
 			User.get(1).achievements.size() == 1
     }
 }

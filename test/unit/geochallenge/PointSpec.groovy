@@ -1,5 +1,6 @@
 package geochallenge
 
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
@@ -7,7 +8,7 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
 @TestFor(Point)
-@Mock([PointContent, Challenge, User])
+@Mock([Challenge, User])
 class PointSpec extends Specification {
 
     def setup() {
@@ -15,10 +16,8 @@ class PointSpec extends Specification {
 		user.save(flush: true)
 		def challenge = new Challenge(title: "title", description: "description", user: user)
 		challenge.save(flush:true)
-		def point = new Point(title: "Nowhere", longitude: 100.0, latitude: 25.5, challenge: challenge)
+		def point = new Point(title: "Nowhere", longitude: 100.0, latitude: 25.5, challenge: challenge, content: "Testing Data")
 		point.save(flush:true)
-		def content = new PointContent(type: ContentType.TEXT, data: "Testing Data".bytes, point: point)
-		content.save(flush:true)
     }
 
     def cleanup() {
@@ -28,9 +27,7 @@ class PointSpec extends Specification {
 		expect:
 			Challenge.count() == 1
 			Point.count() == 1
-			new String(PointContent.get(1).data, "UTF-8") == "Testing Data"
-			PointContent.get(1).type == ContentType.TEXT
-			PointContent.get(1).point == Point.get(1)
+			Point.get(1).content == "Testing Data"
 			Point.get(1).longitude == 100.0
 			Point.get(1).latitude == 25.5
 			Point.get(1).title == "Nowhere"
@@ -39,15 +36,12 @@ class PointSpec extends Specification {
 			def point = Point.get(1)
 			point.longitude = 18.34
 			point.latitude = 4.224
-			def content = new PointContent(type: ContentType.TEXT, data: "New Data".bytes)
-			PointContent.get(1).delete(flush:true)
-			content.save(flush:true)
-			point.content = content
+			point.content = "New Data"
 			point.save(flush:true)
 		then:
 			Point.get(1).longitude == 18.34
 			Point.get(1).latitude == 4.224
-			new String(Point.get(1).content.data, "UTF-8") == "New Data"
+			Point.get(1).content == "New Data"
 			
 		when:
 			Point.get(1).delete(flush:true)
