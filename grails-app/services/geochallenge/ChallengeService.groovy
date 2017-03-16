@@ -35,10 +35,11 @@ class ChallengeService {
 	
 	/**
 	 * 
-	 * @param user User search i.e. Challenged owned by this user (optional)
+	 * @param user User search i.e. Challenges owned by this user (optional)
 	 * @param longitude (gps coord of current location of requester) (optional)
 	 * @param latitude (gps coord of current location of requester) (optional)
 	 * @param radius (max distance from requester in meters) (optional)
+	 * @param sort ("popular" or "nearby") (optional - defaults to popular)
 	 * @param max (max number of results to be returned)
 	 * @return list of challenges
 	 */
@@ -87,12 +88,21 @@ class ChallengeService {
 		return results.take(max)
 	}
 	
-	def toJSON(challenge) {
-		def jsonObject = [title: challenge.title, description: challenge.description, dateCreated: challenge.dateCreated.getTime(), lastUpdated: challenge.lastUpdated.getTime(),
-			expires: challenge.expires ? challenge.expires.getTime() : null, user: challenge.user.id, points: []]
+	def toJSON(data) {
+		def jsonObject
 		
-		challenge.points.each { point ->
-			jsonObject.points.push([title: point.title, latitude: point.latitude, longitude: point.longitude, content: point.content])
+		if(data instanceof List) {
+			jsonObject = []
+			data.each { challenge ->
+				jsonObject.push(toJSON(challenge))
+			}
+		}
+		else {
+			jsonObject = [title: data.title, description: data.description, dateCreated: data.dateCreated.getTime(), lastUpdated: data.lastUpdated.getTime(),
+			                  expires: data.expires ? data.expires.getTime() : null, user: data.user.id, points: []]
+			data.points.each { point ->
+				jsonObject.points.push([title: point.title, latitude: point.latitude, longitude: point.longitude, content: point.content])
+			}
 		}
 		
 		return jsonObject

@@ -1,5 +1,6 @@
 package geochallenge
 
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
@@ -61,15 +62,15 @@ class UserControllerSpec extends Specification {
     	expect:
     		User.count() == 1
     		
-    		when:
-    			params.name = "ale"
-    			params.surrogateId = "other"
-    			params.token = "wrong token"
-    			controller.create()
-    			then:
-    				User.count() == 1
-    				response.json.success == false
-    				response.json.error == AuthService.ERROR_AUTH_FAILURE
+		when:
+			params.name = "ale"
+			params.surrogateId = "other"
+			params.token = "wrong token"
+			controller.create()
+		then:
+			User.count() == 1
+			response.json.success == false
+			response.json.error == AuthService.ERROR_AUTH_FAILURE
     }
 	
 	void "test create duplicate surrogate id"() {

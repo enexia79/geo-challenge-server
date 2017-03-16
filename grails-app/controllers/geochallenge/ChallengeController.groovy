@@ -1,24 +1,34 @@
 package geochallenge
 
+import javax.validation.constraints.Max
+
 import grails.converters.JSON
+
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
 class ChallengeController {
-	public static final String ERROR_MISSING_USER					= "missing_user"
-	public static final String ERROR_MISSING_CHALLENGE				= "missing_challenge"
-	public static final String ERROR_USER_DOESNT_EXIST				= "user_doesnt_exist"
-	public static final String ERROR_INVALID_JSON					= "invalid_json"
-	public static final String ERROR_MISSING_TITLE					= "missing_title"
-	public static final String ERROR_EXPIRES_INVALID				= "expires_not_long_number"
-	public static final String ERROR_MISSING_POINTS					= "missing_points"
-	public static final String ERROR_MISSING_POINT					= "missing_point"
-	public static final String ERROR_POINT_GPS_INVALID				= "point_gps_invalid"
 	public static final String ERROR_CHALLENGE_DOESNT_EXIST			= "challenge_doesnt_exist"
 	public static final String ERROR_CHALLENGE_HAS_ACHIEVEMENT		= "challenge_has_achievement"
+	public static final String ERROR_EXPIRES_INVALID				= "expires_not_long_number"
+	public static final String ERROR_INVALID_JSON					= "invalid_json"
+	public static final String ERROR_MAX_NOT_INTEGER				= "max_not_integer"
+	public static final String ERROR_MAX_LIMIT_EXCEEDED				= "max_limit_exceeded"
+	public static final String ERROR_MISSING_CHALLENGE				= "missing_challenge"
+	public static final String ERROR_MISSING_LOCATION_PARAMETER		= "missing_location_parameter"
+	public static final String ERROR_MISSING_POINT					= "missing_point"
+	public static final String ERROR_MISSING_POINTS					= "missing_points"
+	public static final String ERROR_MISSING_TITLE					= "missing_title"
+	public static final String ERROR_MISSING_USER					= "missing_user"
 	public static final String ERROR_POINT_DOESNT_EXIST				= "point_doesnt_exist"
+	public static final String ERROR_POINT_GPS_INVALID				= "point_gps_invalid"
+	public static final String ERROR_UNKNOWN_SORT_TYPE				= "unknown_sort_type"
+	public static final String ERROR_USER_DOESNT_EXIST				= "user_doesnt_exist"
+	
+	public static final Integer	DEFAULT_MAX							= 100;
+	public static final Integer MAX_RESULTS							= 1000;
 	
 	def challengeService
 	def authService
@@ -153,4 +163,60 @@ class ChallengeController {
 		
 		render results as JSON
 	}	
+	
+	/**
+	 * search challenges
+	 * @param token Application authentication token
+	 * @param user User search i.e. Challenges owned by this user (optional)
+	 * @param latitude (gps coord of current location of requester) (optional, required if specifying gps location)
+	 * @param longitude (gps coord of current location of requester) (optional, required if specifying gps location)
+	 * @param radius (max distance from requester in meters) (optional, required if specifying gps location)
+	 * @param sort ("popular" or "nearby") (optional - defaults to popular, if "nearby" is selected than gps location parameters are required)
+	 * @param max (max number of results to be returned) (<= 1000 - optional, defaults to 100)
+	 * @return JSON response with success = true or false.  if true, challenges = challenges JSON info.  if false, error field will contain error string.
+	 * 			Error codes: auth_failure, max_limit_exceeded, missing_location_parameter, unknown_sort_type, user_doesnt_exist, max_not_integer, point_gps_invalid
+	 */
+	def search() {
+		def challenges
+		def results
+		
+		if(!authService.isAuthorized(params.token)) {
+			results = [success: false, error: AuthService.ERROR_AUTH_FAILURE]
+		}
+		// check if missing any one of the location params when at least one is specified
+		else if((params.latitude || params.longitude || params.radius) && !(params.latitude && params.longitude && params.radius)) {
+			results = [success: false, error: ERROR_MISSING_LOCATION_PARAMETER]
+		}
+		else if(params.sort && params.sort == ChallengeService.SORT_NEARBY && !(params.latitude && params.longitude && params.radius)) {
+			results = [success: false, error: ERROR_MISSING_LOCATION_PARAMETER]
+		}
+		else if(params.sort && params.sort != ChallengeService.SORT_NEARBY && params.sort != ChallengeService.SORT_POPULAR) {
+			results = [success: false, error: ERROR_UNKNOWN_SORT_TYPE]
+		}
+		else if(params.user && User.get(params.user) == null) {
+			results = [success: false, error: ERROR_USER_DOESNT_EXIST]
+		}
+		else if(params.max && params.int('max') == null) {
+			results = [success: false, error: ERROR_MAX_NOT_INTEGER]
+		}
+		else if(params.max && params.int('max') > MAX_RESULTS) {
+			results = [success: false, error: ERROR_MAX_LIMIT_EXCEEDED]
+		}
+		else if(params.radius && (!params.latitude.isBigDecimal() || !params.longitude.isBigDecimal() || !params.radius.isBigDecimal())) {
+			results = [success: false, error: ERROR_POINT_GPS_INVALID]
+		}
+		else {
+			def user		= params.user ? User.get(params.user) : null
+			def latitude	= params.latitude?.toBigDecimal()
+			def longitude	= params.longitude?.toBigDecimal()
+			def radius		= params.radius?.toBigDecimal()
+			def max			= params.max ? params.int('max') : DEFAULT_MAX
+			
+			challenges = challengeService.search(user: user, latitude: latitude, longitude: longitude, radius: radius, sort: params.sort, max: max)
+			
+			results = [success: true, challenges: challengeService.toJSON(challenges)]
+		}
+		
+		render results as JSON
+	}
 }

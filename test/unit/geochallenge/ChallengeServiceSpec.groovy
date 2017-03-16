@@ -231,12 +231,50 @@ class ChallengeServiceSpec extends Specification {
 			jsonObject.description == "description"
 			jsonObject.user == 1
 			jsonObject.points.size() == 2
-			jsonObject.points.toList().get(0).latitude == Point.get(1).latitude
-			jsonObject.points.toList().get(0).longitude == Point.get(1).longitude
-			jsonObject.points.toList().get(0).content == "Testing Data"
-			jsonObject.points.toList().get(1).longitude == 21.1
-			jsonObject.points.toList().get(1).latitude == 2.2
-			jsonObject.points.toList().get(1).content == null
+			jsonObject.points[0].latitude == Point.get(1).latitude
+			jsonObject.points[0].longitude == Point.get(1).longitude
+			jsonObject.points[0].content == "Testing Data"
+			jsonObject.points[1].longitude == 21.1
+			jsonObject.points[1].latitude == 2.2
+			jsonObject.points[1].content == null
 	}
 	
+	void "test toJSON List"() {
+		expect:
+			User.count() == 2
+			Challenge.count() == 1
+			Point.count() == 2
+			
+		when:
+			def pointInfo	= [title: "title", latitude: 2.5, longitude: 1.5, content: "Your not done"]
+			def pointInfo2	= [title: "title2", latitude: 4.0, longitude: 3.0]
+			def challenge 	= service.create([title: "title2", description: "description2", expires: new Date(), user: User.get(1)], [pointInfo, pointInfo2])
+		then:
+			Challenge.count() == 2
+			
+		when:
+			def jsonObject = service.toJSON(Challenge.getAll())
+		then:
+			jsonObject != null
+			jsonObject[0].title == "title"
+			jsonObject[0].description == "description"
+			jsonObject[0].user == 1
+			jsonObject[0].points.size() == 2
+			jsonObject[0].points[0].latitude == Point.get(1).latitude
+			jsonObject[0].points[0].longitude == Point.get(1).longitude
+			jsonObject[0].points[0].content == "Testing Data"
+			jsonObject[0].points[1].latitude == 2.2
+			jsonObject[0].points[1].longitude == 21.1
+			jsonObject[0].points[1].content == null
+			jsonObject[1].title == "title2"
+			jsonObject[1].description == "description2"
+			jsonObject[1].user == 1
+			jsonObject[1].points.size() == 2
+			jsonObject[1].points[0].latitude == Point.get(3).latitude
+			jsonObject[1].points[0].longitude == Point.get(3).longitude
+			jsonObject[1].points[0].content == "Your not done"
+			jsonObject[1].points[1].latitude ==	4.0
+			jsonObject[1].points[1].longitude == 3.0
+			jsonObject[1].points[1].content == null
+	}
 }
