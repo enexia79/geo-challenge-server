@@ -18,4 +18,8 @@ class User {
 		achievements nullable: true
 		challenges nullable: true
     }
+	
+	public boolean isActive() {
+		return active;
+	}
 }

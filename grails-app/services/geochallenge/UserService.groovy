@@ -51,4 +51,19 @@ class UserService {
 		
 		return false
 	}
+	
+	def toJSON(data) {
+		def jsonObject
+		
+		if(data instanceof List) {
+			jsonObject = []
+			data.each { user ->
+				jsonObject.push(toJSON(user))
+			}
+		}
+		else
+			jsonObject = [name: data.name, id: data.id, surrogateId: data.surrogateId, dateCreated: data.dateCreated.getTime(), lastUpdated: data.lastUpdated.getTime(), active: data.isActive()]
+		
+		return jsonObject
+	}
 }

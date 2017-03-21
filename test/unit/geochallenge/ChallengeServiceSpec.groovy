@@ -230,6 +230,8 @@ class ChallengeServiceSpec extends Specification {
 			jsonObject.title == "title"
 			jsonObject.description == "description"
 			jsonObject.user == 1
+			jsonObject.dateCreated != null
+			jsonObject.lastUpdated != null
 			jsonObject.points.size() == 2
 			jsonObject.points[0].latitude == Point.get(1).latitude
 			jsonObject.points[0].longitude == Point.get(1).longitude

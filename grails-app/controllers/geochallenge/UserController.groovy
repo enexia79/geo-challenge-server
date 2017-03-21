@@ -70,4 +70,61 @@ class UserController {
 		
 		render results as JSON
 	}
+	
+	/**
+	 * Get the user info given id
+	 * @param token Application authentication token
+	 * @param user	User Id
+	 * @return JSON response with success = true or false.  if true then user = user info else error field will contain error string. Error codes: auth_failure, missing_user, user_doesnt_exist
+	 */
+	def get() {
+		def user
+		def results
+		
+		if(!authService.isAuthorized(params.token))
+			results = [success: false, error: AuthService.ERROR_AUTH_FAILURE]
+		else if(params.user) {
+			user = User.get(params.user)
+					
+			if(user)
+				results = [success: true, user: userService.toJSON(user)]
+			else
+				results = [success: false, error: ChallengeController.ERROR_USER_DOESNT_EXIST]
+			
+		}
+		else
+			results = [success: false, error: ChallengeController.ERROR_MISSING_USER]
+		
+		render results as JSON
+	}
+	
+	/**
+	 * Deactivate or Activate User given user Id
+	 * @param token Application authentication token
+	 * @param user	User Id
+	 * @return JSON response with success = true or false.  if true then active = <new state (true or false)> info else error field will contain error string. Error codes: auth_failure, missing_user, user_doesnt_exist
+	 */
+	def toggleActive() {
+		def user
+		def results
+		
+		if(!authService.isAuthorized(params.token))
+			results = [success: false, error: AuthService.ERROR_AUTH_FAILURE]
+		else if(params.user) {
+			user = User.get(params.user)
+					
+			if(user) {
+				userService.toggleActive(user)
+				
+				results = [success: true, active: User.get(params.user).isActive()]
+			}
+			else
+				results = [success: false, error: ChallengeController.ERROR_USER_DOESNT_EXIST]
+			
+		}
+		else
+			results = [success: false, error: ChallengeController.ERROR_MISSING_USER]
+		
+		render results as JSON
+	}
 }

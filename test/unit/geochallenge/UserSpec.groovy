@@ -9,19 +9,16 @@ import spock.lang.Specification
 @TestFor(User)
 class UserSpec extends Specification {
 
-    def setup() 
-	{
+    def setup() {
 		def user = new User(name: 'david', surrogateId: 'enexia@gmail.com')
 		
 		user.save(flush:true)
     }
 
-    def cleanup() 
-	{
+    def cleanup() {
     }
 	
-    void "test firstLoad"() 
-	{
+    void "test firstLoad"() {
     	def user = new User(name: 'test', surrogateId: 'another@gmail.com')
 		when:
 			user.save(flush:true)
@@ -35,8 +32,7 @@ class UserSpec extends Specification {
 			foundUser.surrogateId.equals('another@gmail.com')
     }
 	
-	void "test delete"()
-	{
+	void "test delete"() {
 		def user = User.findBySurrogateId('enexia@gmail.com')
 		when:
 			user.delete()
@@ -44,16 +40,14 @@ class UserSpec extends Specification {
 			User.findBySurrogateId('enexia@gmail.com') == null;
 	}
 	
-	void "test unique surrogateID"()
-	{
+	void "test unique surrogateID"() {
 		when:
 			(new User(name: 'david', surrogateId: 'enexia@gmail.com')).save(failOnError:false)
 		then:
 			User.count() == 1
 	}
 	
-	void "test default values"()
-	{
+	void "test default values"() {
 		when:
 			def user 	= new User(name: 'alejandra', surrogateId: 'bogas@nowhere.com').save(flush:true)
 			def user2 	= User.get(user.id)

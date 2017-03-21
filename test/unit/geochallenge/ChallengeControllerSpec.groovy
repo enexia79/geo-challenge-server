@@ -152,6 +152,29 @@ class ChallengeControllerSpec extends Specification {
 			response.json.error == controller.ERROR_USER_DOESNT_EXIST
 	}
 	
+	void "test create user inactive"() {
+		expect:
+			User.count() == 1
+			Challenge.count() == 0
+			
+		when:
+			def user = User.get(1)
+			user.active = Boolean.FALSE
+			user.save()
+		then:
+			user.isActive() == false
+			
+		when:
+			params.user = "1"
+			params.token = TOKEN
+			params.challenge = '{title: "title", expires: 1488907050430, points: [{longitude: 3.0, latitude: 2.5, content: "Testing"}]}'
+			controller.create()
+		then:
+			Challenge.count() == 0
+			response.json.success == false
+			response.json.error == ChallengeController.ERROR_USER_INACTIVE
+	}
+	
 	void "test create missing user"() {
 		when:
 			params.token = TOKEN
@@ -343,6 +366,31 @@ class ChallengeControllerSpec extends Specification {
 			Challenge.count() == 1
 			response.json.success == false
 			response.json.error == controller.ERROR_CHALLENGE_DOESNT_EXIST
+	}
+	
+	void "test delete user inactive"() {
+		expect:
+			User.count() == 1
+			Challenge.count() == 0
+			
+		when:
+			def user = User.get(1)
+			controller.challengeService.create([title: "deleteMe", user: user], [[longitude: 4.0, latitude: 3.0]])
+			user.active = Boolean.FALSE
+			user.save()
+		then:
+			Challenge.count() == 1
+			user.isActive() == false
+			
+		when:
+			params.user = "1"
+			params.token = TOKEN
+			params.challenge = '{title: "title", expires: 1488907050430, points: [{longitude: 3.0, latitude: 2.5, content: "Testing"}]}'
+			controller.create()
+		then:
+			Challenge.count() == 1
+			response.json.success == false
+			response.json.error == ChallengeController.ERROR_USER_INACTIVE
 	}
 	
 	void "test delete missing challenge"() {

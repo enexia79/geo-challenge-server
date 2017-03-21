@@ -14,7 +14,7 @@ class UserControllerSpec extends Specification {
 	private final String TOKEN = "geo-ninjas"
 	
     def setup() {
-		def user = new User(name: 'david', surrogateId: 'enexia@gmail.com')
+		def user = new User(name: 'david', surrogateId: 'nospam@thank.you')
 		
 		user.save()
 		
@@ -36,6 +36,12 @@ class UserControllerSpec extends Specification {
 		service.demand.getIdBySurrogateId(0..1) {
 			def surrogateId ->
 			return User.findBySurrogateId(surrogateId)?.id
+		}
+		service.demand.toJSON(0..1) {
+			return [name: "mocked"]
+		}
+		service.demand.toggleActive(0..1) {
+			return true
 		}
 		controller.userService = service.createMock()
     }
@@ -79,7 +85,7 @@ class UserControllerSpec extends Specification {
 			
 		when:
 			params.name = "ale"
-			params.surrogateId = "enexia@gmail.com"
+			params.surrogateId = "nospam@thank.you"
 			params.token = TOKEN
 			controller.create()
 		then:
@@ -123,7 +129,7 @@ class UserControllerSpec extends Specification {
 			User.count() == 1
 			
 		when:
-			params.surrogateId = "enexia@gmail.com"
+			params.surrogateId = "nospam@thank.you"
 			params.token = TOKEN
 			controller.getId()
 		then:
@@ -137,7 +143,7 @@ class UserControllerSpec extends Specification {
 			User.count() == 1
 			
 		when:
-			params.surrogateId = "enexia@gmail.com"
+			params.surrogateId = "nospam@thank.you"
 			params.token = "blah"
 			controller.getId()
 		then:
@@ -169,5 +175,92 @@ class UserControllerSpec extends Specification {
 	then:
 		response.json.success == false
 		response.json.error == UserController.ERROR_SURROGATE_ID_DOES_NOT_EXIST
+	}
+	
+	void "test get"() {
+		expect:
+			User.count() == 1
+			
+		when:
+			params.user = "1"
+			params.token = TOKEN
+			controller.get()
+		then:
+			response.json.success == true
+			response.json.user != null
+	}
+	
+	void "test get unauthorized"() {
+		when:
+			params.user = "1"
+			params.token = "other"
+			controller.get()
+		then:
+			response.json.success == false
+			response.json.user == null
+			response.json.error == AuthService.ERROR_AUTH_FAILURE
+	}
+	
+	void "test get user doesnt exist"() {
+		when:
+			params.user = "1000"
+			params.token = TOKEN
+			controller.get()
+		then:
+			response.json.success == false
+			response.json.user == null
+			response.json.error == ChallengeController.ERROR_USER_DOESNT_EXIST
+	}
+	
+	void "test get missing user"() {
+		when:
+			params.token = TOKEN
+			controller.get()
+		then:
+			response.json.success == false
+			response.json.user == null
+			response.json.error == ChallengeController.ERROR_MISSING_USER
+	}
+	
+	void "test toggleActive"() {
+		when: 
+			params.token = TOKEN
+			params.user = "1"
+			controller.toggleActive()
+		then:
+			response.json.success == true
+			response.json.active != null
+	}
+	
+	void "test toggleActive unauthorized"() {
+		when:
+			params.user = "1"
+			params.token = "other"
+			controller.toggleActive()
+		then:
+			response.json.success == false
+			response.json.active == null
+			response.json.error == AuthService.ERROR_AUTH_FAILURE
+	}
+	
+	void "test toggleActive user doesnt exist"() {
+		when:
+			params.user = "1000"
+			params.token = TOKEN
+			controller.toggleActive()
+		then:
+			response.json.success == false
+			response.json.active == null
+			response.json.error == ChallengeController.ERROR_USER_DOESNT_EXIST
+	}
+	
+	void "test toggleActive missing user"() {
+		when:
+			params.token = TOKEN
+			controller.toggleActive()
+		then:
+			response.json.success == false
+			response.json.active == null
+			response.json.error == ChallengeController.ERROR_MISSING_USER
 	}
 }

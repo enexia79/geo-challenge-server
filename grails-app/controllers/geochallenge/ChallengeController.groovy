@@ -26,6 +26,7 @@ class ChallengeController {
 	public static final String ERROR_POINT_GPS_INVALID				= "point_gps_invalid"
 	public static final String ERROR_UNKNOWN_SORT_TYPE				= "unknown_sort_type"
 	public static final String ERROR_USER_DOESNT_EXIST				= "user_doesnt_exist"
+	public static final String ERROR_USER_INACTIVE					= "user_inactive"
 	
 	public static final Integer	DEFAULT_MAX							= 100;
 	public static final Integer MAX_RESULTS							= 1000;
@@ -42,7 +43,7 @@ class ChallengeController {
 	 * 				{title: "PointB Title", longitude: 12.0, latitude: 11.0},
 	 * 				{title: "PointC Title", longitude: 8.0, latitude: 11.65, content: "The end"}]}
 	 * @return JSON response with success = true or false.  if true then id = <new challenge id> else error field will contain error string.  
-	 * 			Error codes: auth_failure, missing_user, missing_challenge, user_doesnt_exist, invalid_json, missing_title, expires_not_long_number, missing_points, point_gps_invalid
+	 * 			Error codes: auth_failure, missing_user, missing_challenge, user_doesnt_exist, invalid_json, missing_title, expires_not_long_number, missing_points, point_gps_invalid, user_inactive
 	 */
     def create() {
 		def challenge
@@ -54,7 +55,7 @@ class ChallengeController {
 		else if(params.user && params.challenge) {
 			def user = User.get(params.user)
 					
-			if(user) {
+			if(user && user.isActive()) {
 				try {
 					def challengeInfo = new JSONObject(params.challenge)
 					if(challengeInfo.title == null || challengeInfo.title.trim().isEmpty())
@@ -91,16 +92,16 @@ class ChallengeController {
 					results = [success: false, error: e.getMessage()]
 				}
 			}
+			else if(user)
+				results = [success: false, error: ERROR_USER_INACTIVE]
 			else
 				results = [success: false, error: ERROR_USER_DOESNT_EXIST]
 			
 		}
-		else if(params.user == null) {
+		else if(params.user == null)
 			results = [success: false, error: ERROR_MISSING_USER]
-		}
-		else {
+		else
 			results = [success: false, error: ERROR_MISSING_CHALLENGE]
-		}
 		
 		render results as JSON
 	}
@@ -137,7 +138,7 @@ class ChallengeController {
 	 * @param token Application authentication token
 	 * @param challenge Challenge Id
 	 * @return JSON response with success = true or false.  if false, error field will contain error string.
-	 * 			Error codes: auth_failure, missing_challenge, challenge_doesnt_exist, challenge_has_achievement
+	 * 			Error codes: auth_failure, missing_challenge, challenge_doesnt_exist, challenge_has_achievement, user_inactive
 	 */
 	def delete() {
 		def results
@@ -145,9 +146,9 @@ class ChallengeController {
 		if(!authService.isAuthorized(params.token)) {
 			results = [success: false, error: AuthService.ERROR_AUTH_FAILURE]
 		}
-		else if(params.challenge){
+		else if(params.challenge) {
 			def challenge = Challenge.get(params.challenge)
-			if(challenge) {
+			if(challenge && challenge.user.isActive()) {
 				if(Achievement.findByChallenge(challenge))
 					results = [success: false, error: ERROR_CHALLENGE_HAS_ACHIEVEMENT]
 				else {
@@ -155,6 +156,8 @@ class ChallengeController {
 					results = [success: true]
 				}
 			}
+			else if(challenge)
+				results = [success: false, error: ERROR_USER_INACTIVE]
 			else
 				results = [success: false, error: ERROR_CHALLENGE_DOESNT_EXIST]
 		}
