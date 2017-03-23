@@ -10,7 +10,7 @@ import spock.lang.Specification
 class UserSpec extends Specification {
 
     def setup() {
-		def user = new User(name: 'david', surrogateId: 'enexia@gmail.com')
+		def user = new User(name: 'david', surrogateId: 'nospam@nowhere.com')
 		
 		user.save(flush:true)
     }
@@ -33,16 +33,16 @@ class UserSpec extends Specification {
     }
 	
 	void "test delete"() {
-		def user = User.findBySurrogateId('enexia@gmail.com')
+		def user = User.findBySurrogateId('nospam@nowhere.com')
 		when:
 			user.delete()
 		then:
-			User.findBySurrogateId('enexia@gmail.com') == null;
+			User.findBySurrogateId('nospam@nowhere.com') == null;
 	}
 	
 	void "test unique surrogateID"() {
 		when:
-			(new User(name: 'david', surrogateId: 'enexia@gmail.com')).save(failOnError:false)
+			(new User(name: 'david', surrogateId: 'nospam@nowhere.com')).save(failOnError:false)
 		then:
 			User.count() == 1
 	}

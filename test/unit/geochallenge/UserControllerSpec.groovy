@@ -209,7 +209,7 @@ class UserControllerSpec extends Specification {
 		then:
 			response.json.success == false
 			response.json.user == null
-			response.json.error == ChallengeController.ERROR_USER_DOESNT_EXIST
+			response.json.error == UserController.ERROR_USER_DOESNT_EXIST
 	}
 	
 	void "test get missing user"() {
@@ -219,7 +219,7 @@ class UserControllerSpec extends Specification {
 		then:
 			response.json.success == false
 			response.json.user == null
-			response.json.error == ChallengeController.ERROR_MISSING_USER
+			response.json.error == UserController.ERROR_MISSING_USER
 	}
 	
 	void "test toggleActive"() {
@@ -251,7 +251,7 @@ class UserControllerSpec extends Specification {
 		then:
 			response.json.success == false
 			response.json.active == null
-			response.json.error == ChallengeController.ERROR_USER_DOESNT_EXIST
+			response.json.error == UserController.ERROR_USER_DOESNT_EXIST
 	}
 	
 	void "test toggleActive missing user"() {
@@ -261,6 +261,6 @@ class UserControllerSpec extends Specification {
 		then:
 			response.json.success == false
 			response.json.active == null
-			response.json.error == ChallengeController.ERROR_MISSING_USER
+			response.json.error == UserController.ERROR_MISSING_USER
 	}
 }

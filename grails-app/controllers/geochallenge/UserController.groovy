@@ -4,9 +4,12 @@ import grails.converters.JSON
 
 class UserController {
 	public static final String ERROR_DUPLICATE_SURROGATE_ID 		= "duplicate_surrogateId"
-	public static final String ERROR_SURROGATE_ID_DOES_NOT_EXIST 	= "surrogateId_doesnt_exist"
 	public static final String ERROR_MISSING_NAME 					= "missing_name"
 	public static final String ERROR_MISSING_SURROGATE_ID			= "missing_surrogateId"
+	public static final String ERROR_MISSING_USER					= "missing_user"
+	public static final String ERROR_SURROGATE_ID_DOES_NOT_EXIST 	= "surrogateId_doesnt_exist"
+	public static final String ERROR_USER_DOESNT_EXIST				= "user_doesnt_exist"
+	public static final String ERROR_USER_INACTIVE					= "user_inactive"
 	
 	def userService
 	def authService
@@ -89,11 +92,11 @@ class UserController {
 			if(user)
 				results = [success: true, user: userService.toJSON(user)]
 			else
-				results = [success: false, error: ChallengeController.ERROR_USER_DOESNT_EXIST]
+				results = [success: false, error: ERROR_USER_DOESNT_EXIST]
 			
 		}
 		else
-			results = [success: false, error: ChallengeController.ERROR_MISSING_USER]
+			results = [success: false, error: ERROR_MISSING_USER]
 		
 		render results as JSON
 	}
@@ -119,11 +122,11 @@ class UserController {
 				results = [success: true, active: User.get(params.user).isActive()]
 			}
 			else
-				results = [success: false, error: ChallengeController.ERROR_USER_DOESNT_EXIST]
+				results = [success: false, error: ERROR_USER_DOESNT_EXIST]
 			
 		}
 		else
-			results = [success: false, error: ChallengeController.ERROR_MISSING_USER]
+			results = [success: false, error: ERROR_MISSING_USER]
 		
 		render results as JSON
 	}

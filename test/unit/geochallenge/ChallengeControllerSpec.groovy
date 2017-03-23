@@ -14,7 +14,7 @@ class ChallengeControllerSpec extends Specification {
 	private final String TOKEN = "geo-ninjas"
 	
     def setup() {
-		def user = new User(name: 'david', surrogateId: 'enexia@gmail.com')
+		def user = new User(name: 'david', surrogateId: 'nospam@nowhere.com')
 		
 		user.save()
 		
@@ -89,7 +89,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 0
 			response.json.success == false
-			response.json.error == controller.ERROR_MISSING_TITLE
+			response.json.error == ChallengeController.ERROR_MISSING_TITLE
 	}
 	
 	void "test create invalid expires"() {
@@ -101,7 +101,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 0
 			response.json.success == false
-			response.json.error == controller.ERROR_EXPIRES_INVALID
+			response.json.error == ChallengeController.ERROR_EXPIRES_INVALID
 	}
 	
 	void "test create missing points"() {
@@ -113,7 +113,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 0
 			response.json.success == false
-			response.json.error == controller.ERROR_MISSING_POINTS
+			response.json.error == ChallengeController.ERROR_MISSING_POINTS
 	}
 	
 	void "test create invalid gps"() {
@@ -125,7 +125,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 0
 			response.json.success == false
-			response.json.error == controller.ERROR_POINT_GPS_INVALID
+			response.json.error == ChallengeController.ERROR_POINT_GPS_INVALID
 	}
 	
 	void "test create invalid json"() {
@@ -137,7 +137,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 0
 			response.json.success == false
-			response.json.error == controller.ERROR_INVALID_JSON
+			response.json.error == ChallengeController.ERROR_INVALID_JSON
 	}
 	
 	void "test create user doesnt exist"() {
@@ -149,7 +149,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 0
 			response.json.success == false
-			response.json.error == controller.ERROR_USER_DOESNT_EXIST
+			response.json.error == UserController.ERROR_USER_DOESNT_EXIST
 	}
 	
 	void "test create user inactive"() {
@@ -172,7 +172,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 0
 			response.json.success == false
-			response.json.error == ChallengeController.ERROR_USER_INACTIVE
+			response.json.error == UserController.ERROR_USER_INACTIVE
 	}
 	
 	void "test create missing user"() {
@@ -183,7 +183,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 0
 			response.json.success == false
-			response.json.error == controller.ERROR_MISSING_USER
+			response.json.error == UserController.ERROR_MISSING_USER
 	}
 	
 	void "test create missing challenge"() {
@@ -194,7 +194,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 0
 			response.json.success == false
-			response.json.error == controller.ERROR_MISSING_CHALLENGE
+			response.json.error == ChallengeController.ERROR_MISSING_CHALLENGE
 	}
 	
 	void "test get"() {
@@ -245,7 +245,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			response.json.success == false
 			response.json.challenge == null
-			response.json.error == controller.ERROR_CHALLENGE_DOESNT_EXIST
+			response.json.error == ChallengeController.ERROR_CHALLENGE_DOESNT_EXIST
 	}
 	
 	void "test get missing challenge"() {
@@ -260,7 +260,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			response.json.success == false
 			response.json.challenge == null
-			response.json.error == controller.ERROR_MISSING_CHALLENGE
+			response.json.error == ChallengeController.ERROR_MISSING_CHALLENGE
 	}
 	
 	void "test delete"() {
@@ -323,7 +323,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 1
 			response.json.success == false
-			response.json.error == controller.ERROR_CHALLENGE_HAS_ACHIEVEMENT
+			response.json.error == ChallengeController.ERROR_CHALLENGE_HAS_ACHIEVEMENT
 	}
 	
 	void "test delete challenge doesnt exist"() {
@@ -344,7 +344,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 1
 			response.json.success == false
-			response.json.error == controller.ERROR_CHALLENGE_DOESNT_EXIST
+			response.json.error == ChallengeController.ERROR_CHALLENGE_DOESNT_EXIST
 	}
 	
 	void "test delete challenge not integer"() {
@@ -365,7 +365,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 1
 			response.json.success == false
-			response.json.error == controller.ERROR_CHALLENGE_DOESNT_EXIST
+			response.json.error == ChallengeController.ERROR_CHALLENGE_DOESNT_EXIST
 	}
 	
 	void "test delete user inactive"() {
@@ -390,7 +390,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 1
 			response.json.success == false
-			response.json.error == ChallengeController.ERROR_USER_INACTIVE
+			response.json.error == UserController.ERROR_USER_INACTIVE
 	}
 	
 	void "test delete missing challenge"() {
@@ -410,7 +410,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			Challenge.count() == 1
 			response.json.success == false
-			response.json.error == controller.ERROR_MISSING_CHALLENGE
+			response.json.error == ChallengeController.ERROR_MISSING_CHALLENGE
 	}
 	
 	void "test search"() {
@@ -529,7 +529,7 @@ class ChallengeControllerSpec extends Specification {
 			controller.search()
 		then:
 			response.json.success == false
-			response.json.error == ChallengeController.ERROR_USER_DOESNT_EXIST
+			response.json.error == UserController.ERROR_USER_DOESNT_EXIST
 	}
 	
 	void "test search missing latitude"() {

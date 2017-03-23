@@ -21,12 +21,9 @@ class ChallengeController {
 	public static final String ERROR_MISSING_POINT					= "missing_point"
 	public static final String ERROR_MISSING_POINTS					= "missing_points"
 	public static final String ERROR_MISSING_TITLE					= "missing_title"
-	public static final String ERROR_MISSING_USER					= "missing_user"
 	public static final String ERROR_POINT_DOESNT_EXIST				= "point_doesnt_exist"
 	public static final String ERROR_POINT_GPS_INVALID				= "point_gps_invalid"
 	public static final String ERROR_UNKNOWN_SORT_TYPE				= "unknown_sort_type"
-	public static final String ERROR_USER_DOESNT_EXIST				= "user_doesnt_exist"
-	public static final String ERROR_USER_INACTIVE					= "user_inactive"
 	
 	public static final Integer	DEFAULT_MAX							= 100;
 	public static final Integer MAX_RESULTS							= 1000;
@@ -93,13 +90,13 @@ class ChallengeController {
 				}
 			}
 			else if(user)
-				results = [success: false, error: ERROR_USER_INACTIVE]
+				results = [success: false, error: UserController.ERROR_USER_INACTIVE]
 			else
-				results = [success: false, error: ERROR_USER_DOESNT_EXIST]
+				results = [success: false, error: UserController.ERROR_USER_DOESNT_EXIST]
 			
 		}
 		else if(params.user == null)
-			results = [success: false, error: ERROR_MISSING_USER]
+			results = [success: false, error: UserController.ERROR_MISSING_USER]
 		else
 			results = [success: false, error: ERROR_MISSING_CHALLENGE]
 		
@@ -157,7 +154,7 @@ class ChallengeController {
 				}
 			}
 			else if(challenge)
-				results = [success: false, error: ERROR_USER_INACTIVE]
+				results = [success: false, error: UserController.ERROR_USER_INACTIVE]
 			else
 				results = [success: false, error: ERROR_CHALLENGE_DOESNT_EXIST]
 		}
@@ -197,7 +194,7 @@ class ChallengeController {
 			results = [success: false, error: ERROR_UNKNOWN_SORT_TYPE]
 		}
 		else if(params.user && User.get(params.user) == null) {
-			results = [success: false, error: ERROR_USER_DOESNT_EXIST]
+			results = [success: false, error: UserController.ERROR_USER_DOESNT_EXIST]
 		}
 		else if(params.max && params.int('max') == null) {
 			results = [success: false, error: ERROR_MAX_NOT_INTEGER]

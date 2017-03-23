@@ -23,7 +23,7 @@ class Challenge {
 		longitude: nullable: false
     }
 	
-		def getAchievements() {
+	def getAchievements() {
 		return Achievement.findAllByChallenge(this)
 	}
 	
