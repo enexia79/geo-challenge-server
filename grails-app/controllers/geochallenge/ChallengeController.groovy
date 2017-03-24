@@ -149,7 +149,9 @@ class ChallengeController {
 				if(Achievement.findByChallenge(challenge))
 					results = [success: false, error: ERROR_CHALLENGE_HAS_ACHIEVEMENT]
 				else {
-					challenge.delete()
+					challenge.delete(flush: true)
+					if(Challenge.get(params.challenge))
+						results = [success: false, error: "Failed to delete"]
 					results = [success: true]
 				}
 			}
