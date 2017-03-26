@@ -227,6 +227,7 @@ class ChallengeServiceSpec extends Specification {
 			def jsonObject = service.toJSON(Challenge.findByTitle("title"))
 		then:
 			jsonObject != null
+			jsonObject.id == 1
 			jsonObject.title == "title"
 			jsonObject.description == "description"
 			jsonObject.user == 1

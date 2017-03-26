@@ -98,7 +98,7 @@ class ChallengeService {
 			}
 		}
 		else {
-			jsonObject = [title: data.title, description: data.description, dateCreated: data.dateCreated.getTime(), lastUpdated: data.lastUpdated.getTime(),
+			jsonObject = [id: data.id, title: data.title, description: data.description, dateCreated: data.dateCreated.getTime(), lastUpdated: data.lastUpdated.getTime(),
 			                  expires: data.expires ? data.expires.getTime() : null, user: data.user.id, points: []]
 			data.points.each { point ->
 				jsonObject.points.push([title: point.title, latitude: point.latitude, longitude: point.longitude, content: point.content])
