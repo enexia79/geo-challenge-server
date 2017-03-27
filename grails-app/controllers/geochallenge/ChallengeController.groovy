@@ -175,6 +175,7 @@ class ChallengeController {
 	 * @param radius (max distance from requester in meters) (optional, required if specifying gps location)
 	 * @param sort ("popular" or "nearby") (optional - defaults to popular, if "nearby" is selected than gps location parameters are required)
 	 * @param max (max number of results to be returned) (<= 1000 - optional, defaults to 100)
+	 * @param includeExpired include expired Challenges true or false (optional)
 	 * @return JSON response with success = true or false.  if true, challenges = challenges JSON info.  if false, error field will contain error string.
 	 * 			Error codes: auth_failure, max_limit_exceeded, missing_location_parameter, unknown_sort_type, user_doesnt_exist, max_not_integer, point_gps_invalid
 	 */
@@ -214,7 +215,7 @@ class ChallengeController {
 			def radius		= params.radius?.toBigDecimal()
 			def max			= params.max ? params.int('max') : DEFAULT_MAX
 			
-			challenges = challengeService.search(user: user, latitude: latitude, longitude: longitude, radius: radius, sort: params.sort, max: max)
+			challenges = challengeService.search(user: user, latitude: latitude, longitude: longitude, radius: radius, sort: params.sort, max: max, includeExpired: params.includeExpired)
 			
 			results = [success: true, challenges: challengeService.toJSON(challenges)]
 		}
