@@ -58,7 +58,7 @@ class ChallengeController {
 					if(challengeInfo.title == null || challengeInfo.title.trim().isEmpty())
 						results = [success: false, error: ERROR_MISSING_TITLE]
 					else {
-						if(challengeInfo.expires && !(challengeInfo.expires instanceof Long)) {
+						if(challengeInfo.expires && !(challengeInfo.expires instanceof Long) && !(challengeInfo.expires instanceof Integer)) {
 							results = [success: false, error: ERROR_EXPIRES_INVALID]
 						}
 						else {

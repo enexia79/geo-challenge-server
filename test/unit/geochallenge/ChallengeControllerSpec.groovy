@@ -64,6 +64,22 @@ class ChallengeControllerSpec extends Specification {
 			response.json.id != null
     }
 	
+	void "test create with int"() {
+		expect:
+			User.count() == 1
+			Challenge.count() == 0
+			
+		when:
+			params.user = "1"
+			params.token = TOKEN
+			params.challenge = '{title: "title", expires: 1234, points: [{longitude: 3.0, latitude: 2.5, content: "Testing"}]}'
+			controller.create()
+		then:
+			Challenge.count() == 1
+			response.json.success == true
+			response.json.id != null
+	}
+	
 	void "test create invalid token"() {
 		expect:
 			User.count() == 1
