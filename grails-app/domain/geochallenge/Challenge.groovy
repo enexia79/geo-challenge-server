@@ -10,6 +10,7 @@ class Challenge {
 	Date	dateCreated
 	Date	lastUpdated
 	Date	expires
+	Set		points = new LinkedHashSet()
 	
 	static hasMany 		= [points: Point]
 	static belongsTo 	= [user: User]

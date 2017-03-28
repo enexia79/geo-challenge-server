@@ -17,10 +17,10 @@ class ChallengeSpec extends Specification {
 		def challenge = new Challenge(title: "title", description: "description", user: user, longitude: 20.0, latitude: 3.5)
 		challenge.save(flush:true)
 		user.addToChallenges(challenge).save(flush: true)
-		def point = new Point(longitude: 20.0, latitude: 3.5, challenge: Challenge.get(1))
+		def point = new Point(title: "B", longitude: 20.0, latitude: 3.5, challenge: Challenge.get(1))
 		point.save(flush:true)
 		Challenge.get(1).addToPoints(point).save(flush:true)
-		point = new Point(longitude: 21.1, latitude: 2.2, challenge: challenge)
+		point = new Point(title: "A", longitude: 21.1, latitude: 2.2, challenge: challenge)
 		point.save(flush:true)
 		challenge.addToPoints(point).save(flush:true)
     }
