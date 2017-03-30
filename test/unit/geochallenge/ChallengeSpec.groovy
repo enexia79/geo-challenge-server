@@ -11,6 +11,9 @@ import spock.lang.Specification
 @Mock([User, Point, Achievement])
 class ChallengeSpec extends Specification {
 
+	private static final int DISTANCE_TO_TEST			= 100000; // in meters
+	private static final int DISTANCE_MARGIN_OF_ERROR 	= 200; // in meters
+	
     def setup() {
 		def user = new User(name: "Billy", surrogateId: "blah@nobody.net")
 		user.save(flush:true)
@@ -112,5 +115,35 @@ class ChallengeSpec extends Specification {
 		then:
 			challenge.getDistance(39.973277, -112.124345) < 47380
 			challenge.getDistance(39.973277, -112.124345) >= 47370
+	}
+	
+	void "test transpose"() {
+		when:
+			def point 		= [latitude: 40.229939, longitude: -111.680585]
+			def newPoint 	= Challenge.transposePoint(point.latitude, point.longitude, Direction.NORTH, DISTANCE_TO_TEST)
+		then:
+			Challenge.distance(point.latitude, point.longitude, newPoint.latitude, newPoint.longitude) < DISTANCE_TO_TEST + DISTANCE_MARGIN_OF_ERROR
+			Challenge.distance(point.latitude, point.longitude, newPoint.latitude, newPoint.longitude) > DISTANCE_TO_TEST - DISTANCE_MARGIN_OF_ERROR
+		
+		when:
+			point 		= [latitude: 40.229939, longitude: -111.680585]
+			newPoint 	= Challenge.transposePoint(point.latitude, point.longitude, Direction.SOUTH, DISTANCE_TO_TEST)
+		then:
+			Challenge.distance(point.latitude, point.longitude, newPoint.latitude, newPoint.longitude) < DISTANCE_TO_TEST + DISTANCE_MARGIN_OF_ERROR
+			Challenge.distance(point.latitude, point.longitude, newPoint.latitude, newPoint.longitude) > DISTANCE_TO_TEST - DISTANCE_MARGIN_OF_ERROR
+		
+		when:
+			point 		= [latitude: 40.229939, longitude: -111.680585]
+			newPoint 	= Challenge.transposePoint(point.latitude, point.longitude, Direction.EAST, DISTANCE_TO_TEST)
+		then:
+			Challenge.distance(point.latitude, point.longitude, newPoint.latitude, newPoint.longitude) < DISTANCE_TO_TEST + DISTANCE_MARGIN_OF_ERROR
+			Challenge.distance(point.latitude, point.longitude, newPoint.latitude, newPoint.longitude) > DISTANCE_TO_TEST - DISTANCE_MARGIN_OF_ERROR
+		
+		when:
+			point 		= [latitude: 40.229939, longitude: -111.680585]
+			newPoint 	= Challenge.transposePoint(point.latitude, point.longitude, Direction.WEST, DISTANCE_TO_TEST)
+		then:
+			Challenge.distance(point.latitude, point.longitude, newPoint.latitude, newPoint.longitude) < DISTANCE_TO_TEST + DISTANCE_MARGIN_OF_ERROR
+			Challenge.distance(point.latitude, point.longitude, newPoint.latitude, newPoint.longitude) > DISTANCE_TO_TEST - DISTANCE_MARGIN_OF_ERROR
 	}
 }

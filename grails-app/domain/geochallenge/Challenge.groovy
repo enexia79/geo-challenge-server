@@ -70,4 +70,36 @@ class Challenge {
 	
 		return Math.sqrt(distance);
 	}
+	
+	/**
+	 * latitude, longitude Start point Direction ENUM (NORTH, SOUTH, EAST, WEST) and distance in meters
+	 * @returns Transposed gps point in given direction with given distance
+	 */
+	public static def transposePoint(latitude, longitude, direction, distance) {
+		Double newLatitude, newLongitude;
+		
+		final int 		DNS = 111111; // estimated distance for 1 degree latitude
+		final double	DEW = 111321*Math.cos(Math.toRadians(latitude)); // estimated distance for 1 degree longitude
+		
+		switch(direction) {
+			case Direction.NORTH:
+				newLatitude 	= latitude + distance*(1/DNS)
+				newLongitude 	= longitude
+				break;
+			case Direction.SOUTH:
+				newLatitude 	= latitude - distance*(1/DNS)
+				newLongitude 	= longitude
+				break;
+			case Direction.EAST:
+				newLatitude 	= latitude
+				newLongitude 	= longitude + distance*(1/DEW)
+				break;
+			case Direction.WEST:
+				newLatitude 	= latitude
+				newLongitude 	= longitude - distance*(1/DEW)
+				break;
+		}
+		
+		return [latitude: newLatitude, longitude: newLongitude];
+	}
 }
