@@ -58,19 +58,32 @@ class ChallengeService {
 		if(sort == SORT_NEARBY && (longitude == null || latitude == null || radius == null))
 			throw new RuntimeException("Missing required parameter(s) for sort nearby : longitude, latitude & radius")
 		
-		def all = user ? Challenge.findAllByUser(user) : Challenge.getAll()
-		def results = []
-		if(longitude && latitude && radius)
-			all.each { challenge ->
-				if(includeExpired || !challenge.isExpired())
-					if(challenge.getDistance(latitude, longitude) <= radius)
-						results.push(challenge)
-			}
+		def all
+		if(longitude && latitude && radius) {
+			def northBoundary 	= Challenge.transposePoint(latitude, longitude, Direction.NORTH, radius) 
+			def southBoundary	= Challenge.transposePoint(latitude, longitude, Direction.SOUTH, radius) 
+			def eastBoundary	= Challenge.transposePoint(latitude, longitude, Direction.EAST, radius) 
+			def westBoundary	= Challenge.transposePoint(latitude, longitude, Direction.WEST, radius)
+			
+			if(user)
+				all = Challenge.findAllByUserAndLatitudeLessThanEqualsAndLatitudeGreaterThanEqualsAndLongitudeLessThanEqualsAndLongitudeGreaterThanEquals(
+					user, northBoundary.latitude, southBoundary.latitude, eastBoundary.longitude, westBoundary.longitude
+				)
+			else
+				all = Challenge.findAllByLatitudeLessThanEqualsAndLatitudeGreaterThanEqualsAndLongitudeLessThanEqualsAndLongitudeGreaterThanEquals(
+					northBoundary.latitude, southBoundary.latitude, eastBoundary.longitude, westBoundary.longitude
+				)
+		}
+		else if(user)
+			all = Challenge.findAllByUser(user)
 		else
-			all.each { challenge ->
-				if(includeExpired || !challenge.isExpired())
-					results.push(challenge)
-			}
+			all = Challenge.all
+			
+		def results = []
+		all.each { challenge ->
+			if(includeExpired || !challenge.isExpired())
+				results.push(challenge)
+		}
 			
 		if(sort == SORT_POPULAR) {
 			results.sort { a, b ->
