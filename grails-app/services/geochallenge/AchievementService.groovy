@@ -31,7 +31,7 @@ class AchievementService {
 			}
 		}
 		else 
-			jsonObject = [user: data.user.id, challenge: data.challenge.id, content: data.content, dateCreated: data.dateCreated.getTime(), lastUpdated: data.lastUpdated.getTime()]
+			jsonObject = [name: data.user.name, user: data.user.id, challenge: data.challenge.id, content: data.content, dateCreated: data.dateCreated.getTime(), lastUpdated: data.lastUpdated.getTime()]
 		
 		return jsonObject
 	}

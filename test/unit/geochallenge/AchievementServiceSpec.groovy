@@ -94,6 +94,7 @@ class AchievementServiceSpec extends Specification {
 			def jsonObject = service.toJSON(Achievement.get(1))
 		then:
 			jsonObject != null
+			jsonObject.name == "ale"
 			jsonObject.user == 2
 			jsonObject.challenge == 1
 			jsonObject.content == "alpha content"
@@ -112,16 +113,19 @@ class AchievementServiceSpec extends Specification {
 		then:
 			jsonObject != null
 			jsonObject.size() == 3
+			jsonObject[0].name == "ale"
 			jsonObject[0].user == 2
 			jsonObject[0].challenge == 1
 			jsonObject[0].content == "alpha content"
 			jsonObject[0].dateCreated != null
 			jsonObject[0].lastUpdated != null
+			jsonObject[1].name == "ale"
 			jsonObject[1].user == 2
 			jsonObject[1].challenge == 3
 			jsonObject[1].content == "charlie content"
 			jsonObject[1].dateCreated != null
 			jsonObject[1].lastUpdated != null
+			jsonObject[2].name == "david"
 			jsonObject[2].user == 1
 			jsonObject[2].challenge == 2
 			jsonObject[2].content == "beta content"
