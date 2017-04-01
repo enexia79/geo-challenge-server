@@ -38,9 +38,13 @@ class ChallengeControllerSpec extends Specification {
 			def searchCriteria ->
 			return []
 		}
-		service.demand.toJSON {
+		service.demand.toJSON(0..1) {
 			def challenge ->
 			return [title: "mocked"]
+		}
+		service.demand.toJSONwithAchievements(0..1) {
+			def challenge ->
+			return [title: "mocked", achievements: []]
 		}
 		controller.challengeService = service.createMock()
     }
@@ -230,6 +234,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			response.json.success == true
 			response.json.challenge != null
+			response.json.challenge.achievements != null
 	}
 	
 	void "test get unauthorized"() {
@@ -445,6 +450,7 @@ class ChallengeControllerSpec extends Specification {
 		then:
 			response.json.success == true
 			response.json.challenges != null
+			response.json.challenges.achievements == null
 	}
 	
 	void "test search by user"() {

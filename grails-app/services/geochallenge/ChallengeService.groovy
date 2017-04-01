@@ -1,6 +1,7 @@
 package geochallenge
 
 import java.util.Date
+import java.util.regex.Pattern.All
 
 import grails.transaction.Transactional
 
@@ -9,6 +10,8 @@ class ChallengeService {
 
 	public static final String SORT_POPULAR = "popular"
 	public static final String SORT_NEARBY 	= "nearby"
+	
+	def achievementService
 
     def create(challengeInfo, pointsInfo) {
 		challengeInfo.latitude 	= pointsInfo[0].latitude;
@@ -51,6 +54,7 @@ class ChallengeService {
 		def max				= searchCriteria.max
 		def includeExpired	= searchCriteria.includeExpired ? searchCriteria.includeExpired : false
 		def sort			= searchCriteria.sort ? searchCriteria.sort : SORT_POPULAR
+		def now				= new Date()
 		
 		if(max == null) 
 			throw new RuntimeException("Missing required parameter max (max_results)")
@@ -58,33 +62,43 @@ class ChallengeService {
 		if(sort == SORT_NEARBY && (longitude == null || latitude == null || radius == null))
 			throw new RuntimeException("Missing required parameter(s) for sort nearby : longitude, latitude & radius")
 		
-		def all
+		def criteria = Challenge.createCriteria()
+		
+		def userClosure = {
+			eq("user", user)
+		}
+		
+		def distanceClosure
 		if(longitude && latitude && radius) {
-			def northBoundary 	= Challenge.transposePoint(latitude, longitude, Direction.NORTH, radius) 
-			def southBoundary	= Challenge.transposePoint(latitude, longitude, Direction.SOUTH, radius) 
-			def eastBoundary	= Challenge.transposePoint(latitude, longitude, Direction.EAST, radius) 
+			def northBoundary 	= Challenge.transposePoint(latitude, longitude, Direction.NORTH, radius)
+			def southBoundary	= Challenge.transposePoint(latitude, longitude, Direction.SOUTH, radius)
+			def eastBoundary	= Challenge.transposePoint(latitude, longitude, Direction.EAST, radius)
 			def westBoundary	= Challenge.transposePoint(latitude, longitude, Direction.WEST, radius)
 			
-			if(user)
-				all = Challenge.findAllByUserAndLatitudeLessThanEqualsAndLatitudeGreaterThanEqualsAndLongitudeLessThanEqualsAndLongitudeGreaterThanEquals(
-					user, northBoundary.latitude, southBoundary.latitude, eastBoundary.longitude, westBoundary.longitude
-				)
-			else
-				all = Challenge.findAllByLatitudeLessThanEqualsAndLatitudeGreaterThanEqualsAndLongitudeLessThanEqualsAndLongitudeGreaterThanEquals(
-					northBoundary.latitude, southBoundary.latitude, eastBoundary.longitude, westBoundary.longitude
-				)
-		}
-		else if(user)
-			all = Challenge.findAllByUser(user)
-		else
-			all = Challenge.all
-			
-		def results = []
-		all.each { challenge ->
-			if(includeExpired || !challenge.isExpired())
-				results.push(challenge)
+			distanceClosure = {
+				between("latitude", southBoundary.latitude, northBoundary.latitude)
+				between("longitude", westBoundary.longitude, eastBoundary.longitude)
+			}
 		}
 			
+		def excludeExpiredClosure = {
+			or {
+				isNull("expires")
+				ge("expires", now)
+			}
+		}
+		
+		// This closure is used to help exclude where clauses not applicable to current search.
+		def trueClosure = {
+			isNotNull("user")
+		}
+		
+		def results = criteria {
+			and(user ? userClosure : trueClosure)
+			and(distanceClosure ? distanceClosure : trueClosure)
+			and(!includeExpired ? excludeExpiredClosure : trueClosure)
+		}
+		
 		if(sort == SORT_POPULAR) {
 			results.sort { a, b ->
 				b.getAchievementsCount() - a.getAchievementsCount()
@@ -101,7 +115,11 @@ class ChallengeService {
 		return results.take(max)
 	}
 	
-	def toJSON(data) {
+	def toJSONwithAchievements(data) {
+		return toJSON(data, true)
+	}
+	
+	def toJSON(data, includeAchievements = false) {
 		def jsonObject
 		
 		if(data instanceof List) {
@@ -112,10 +130,14 @@ class ChallengeService {
 		}
 		else {
 			jsonObject = [id: data.id, title: data.title, description: data.description, dateCreated: data.dateCreated.getTime(), lastUpdated: data.lastUpdated.getTime(),
-			                  expires: data.expires ? data.expires.getTime() : null, user: data.user.id, points: []]
+		                  	expires: data.expires ? data.expires.getTime() : null, user: data.user.id, points: [], achievements: []]
 			data.points.each { point ->
 				jsonObject.points.push([title: point.title, latitude: point.latitude, longitude: point.longitude, content: point.content])
 			}
+			if(includeAchievements)
+				Achievement.findAllByChallenge(data, [sort: "dateCreated", order: "desc"]).each { achievement ->
+					jsonObject.achievements.push(achievementService.toJSON(achievement))
+				}
 		}
 		
 		return jsonObject

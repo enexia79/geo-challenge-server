@@ -8,7 +8,7 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @TestFor(ChallengeService)
-@Mock([User, Challenge, Point, Achievement])
+@Mock([User, Challenge, Point, Achievement, AchievementService])
 class ChallengeServiceSpec extends Specification {
 
     def setup() {
@@ -240,6 +240,43 @@ class ChallengeServiceSpec extends Specification {
 			jsonObject.points[1].longitude == 21.1
 			jsonObject.points[1].latitude == 2.2
 			jsonObject.points[1].content == null
+	}
+	
+	void "test toJSON includeAchievements"() {
+		expect:
+			User.count() == 2
+			Challenge.count() == 1
+			Point.count() == 2
+			
+		when:
+			def achievement = new Achievement(user: User.get(2), challenge: Challenge.get(1))
+			achievement.save()
+			achievement = new Achievement(user: User.get(1), challenge: Challenge.get(1))
+			achievement.save()
+		then:
+			Achievement.count() == 2
+			User.get(1).achievements.size() == 1
+			User.get(2).achievements.size() == 1
+			
+		when:
+			def jsonObject = service.toJSONwithAchievements(Challenge.get(1))
+		then:
+			jsonObject != null
+			jsonObject.id == 1
+			jsonObject.title == "title"
+			jsonObject.description == "description"
+			jsonObject.user == 1
+			jsonObject.dateCreated != null
+			jsonObject.lastUpdated != null
+			jsonObject.points.size() == 2
+			jsonObject.points[0].latitude == Point.get(1).latitude
+			jsonObject.points[0].longitude == Point.get(1).longitude
+			jsonObject.points[0].content == "Testing Data"
+			jsonObject.points[1].longitude == 21.1
+			jsonObject.points[1].latitude == 2.2
+			jsonObject.points[1].content == null
+			jsonObject.achievements != null
+			jsonObject.achievements.size() == 2
 	}
 	
 	void "test toJSON List"() {

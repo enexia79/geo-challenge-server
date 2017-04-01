@@ -120,7 +120,7 @@ class ChallengeController {
 		else if(params.challenge) {
 			challenge = Challenge.get(params.challenge) 
 			if(challenge)
-				results = [success: true, challenge: challengeService.toJSON(challenge)]
+				results = [success: true, challenge: challengeService.toJSONwithAchievements(challenge)]
 			else
 				results = [success: false, error: ERROR_CHALLENGE_DOESNT_EXIST]
 		}

@@ -14,11 +14,11 @@ class AchievementService {
     }
 	
 	def getAllByUser(user) {
-		return Achievement.findAllByUser(user)
+		return Achievement.findAllByUser(user, [sort: "dateCreated", order: "desc"])
 	}
 	
 	def getAllByChallenge(challenge) {
-		return Achievement.findAllByChallenge(challenge)
+		return Achievement.findAllByChallenge(challenge, [sort: "dateCreated", order: "desc"])
 	}
 	
 	def toJSON(data) {
