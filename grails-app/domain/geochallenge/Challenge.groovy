@@ -44,6 +44,10 @@ class Challenge {
 			return false
 	}
 	
+	public List getPointsInOrder() {
+		return Point.findAllByChallenge(this, [sort: "id", order: "asc"]);
+	}
+	
 	/**
 	 * Calculate distance between two points in latitude and longitude taking
 	 * into account height difference. If you are not interested in height
